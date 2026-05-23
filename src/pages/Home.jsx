@@ -50,15 +50,28 @@ function Home() {
       </h1>
 
       {
-        batches.map((batch) => (
+        batches.map((batch, index) => (
 
           <div
-            key={batch.id}
+            key={index}
+
+            onClick={() => {
+
+              localStorage.setItem(
+                "selectedBatch",
+                JSON.stringify(batch)
+              );
+
+              window.location.href = "/player";
+
+            }}
+
             style={{
               background:"#1b1b1b",
               padding:15,
               borderRadius:15,
-              marginBottom:20
+              marginBottom:20,
+              cursor:"pointer"
             }}
           >
 
@@ -72,10 +85,13 @@ function Home() {
               }}
             />
 
-            <h2>{batch.batchName}</h2>
+            <h2>
+              {batch.batchName}
+            </h2>
 
             <p>
-              Lectures: {batch.lectures.length}
+              Lectures:
+              {batch.lectures.length}
             </p>
 
           </div>
