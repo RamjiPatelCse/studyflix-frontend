@@ -1,32 +1,32 @@
+import axios from "axios";
 import { useEffect, useState }
 from "react";
-
-import axios from "axios";
+import { useNavigate }
+from "react-router-dom";
 
 function Home() {
 
-  const [batches, setBatches] =
-  useState([]);
+  const [data, setData] =
+  useState({});
+
+  const navigate =
+  useNavigate();
 
   useEffect(() => {
 
-    getBatches();
+    loadData();
 
   }, []);
 
-  const getBatches =
+  const loadData =
   async () => {
 
-    const response =
+    const res =
     await axios.get(
-
-      "https://studyflix-backend.onrender.com/api/batches"
-
+      "https://studyflix-backend.onrender.com/api/data"
     );
 
-    setBatches(
-      response.data.batches
-    );
+    setData(res.data);
 
   };
 
@@ -34,17 +34,16 @@ function Home() {
 
     <div
       style={{
-        background:"#111",
+        background:"#000",
         minHeight:"100vh",
-        padding:20,
-        color:"white"
+        color:"#fff",
+        padding:"20px"
       }}
     >
 
       <h1
         style={{
-          color:"red",
-          marginBottom:20
+          color:"red"
         }}
       >
         StudyFlix 😄
@@ -52,61 +51,120 @@ function Home() {
 
       {
 
-        batches.map((batch) => (
+        Object.keys(data)
+        .map(subject => (
 
           <div
-
-            key={batch.id}
-
-            onClick={() => {
-
-              localStorage.setItem(
-
-                "selectedBatch",
-
-                JSON.stringify(batch)
-
-              );
-
-              window.location.href =
-              "/player";
-
-            }}
-
+            key={subject}
             style={{
-              background:"#1b1b1b",
-              borderRadius:20,
-              overflow:"hidden",
-              marginBottom:20,
-              cursor:"pointer"
+              marginTop:"30px"
             }}
           >
 
-            <img
+            <h2>
+              📚 {subject}
+            </h2>
 
-              src={batch.thumbnail}
+            {
 
-              alt=""
+              Object.keys(
+                data[subject]
+              ).map(type => (
 
-              style={{
-                width:"100%",
-                height:220,
-                objectFit:"cover"
-              }}
+                <div
+                  key={type}
+                  style={{
+                    marginLeft:"20px"
+                  }}
+                >
 
-            />
+                  <h3>
+                    🔴 {type}
+                  </h3>
 
-            <div
-              style={{
-                padding:15
-              }}
-            >
+                  {
 
-              <h2>
-                {batch.batchName}
-              </h2>
+                    Object.keys(
+                      data[subject][type]
+                    ).map(chapter => (
 
-            </div>
+                      <div
+                        key={chapter}
+                        style={{
+                          marginLeft:"20px"
+                        }}
+                      >
+
+                        <h4>
+                          ✅ {chapter}
+                        </h4>
+
+                        {
+
+                          data[
+                            subject
+                          ][
+                            type
+                          ][
+                            chapter
+                          ].map(lecture => (
+
+                            <div
+
+                              key={
+                                lecture.id
+                              }
+
+                              onClick={() =>
+                                navigate(
+                                  `/watch?id=${lecture.id}`
+                                )
+                              }
+
+                              style={{
+                                background:"#111",
+                                padding:"15px",
+                                borderRadius:"20px",
+                                marginBottom:"20px",
+                                cursor:"pointer"
+                              }}
+
+                            >
+
+                              <img
+
+                                src={
+                                  lecture.thumbnail
+                                }
+
+                                style={{
+                                  width:"100%",
+                                  borderRadius:"20px"
+                                }}
+
+                              />
+
+                              <h3>
+                                ▶ {lecture.title}
+                              </h3>
+
+                            </div>
+
+                          ))
+
+                        }
+
+                      </div>
+
+                    ))
+
+                  }
+
+                </div>
+
+              ))
+
+            }
 
           </div>
 
