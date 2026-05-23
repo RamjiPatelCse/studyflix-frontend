@@ -3,11 +3,14 @@ import axios from "axios";
 
 function Update() {
 
-  const [batchName, setBatchName] = useState("");
+  const [batchName, setBatchName] =
+  useState("");
 
-  const [thumbnail, setThumbnail] = useState("");
+  const [thumbnail, setThumbnail] =
+  useState("");
 
-  const [file, setFile] = useState(null);
+  const [file, setFile] =
+  useState(null);
 
   const createBatch = async () => {
 
@@ -15,11 +18,20 @@ function Update() {
 
       const formData = new FormData();
 
-      formData.append("batchName", batchName);
+      formData.append(
+        "batchName",
+        batchName
+      );
 
-      formData.append("thumbnail", thumbnail);
+      formData.append(
+        "thumbnail",
+        thumbnail
+      );
 
-      formData.append("txt", file);
+      formData.append(
+        "txt",
+        file
+      );
 
       await axios.post(
         "https://studyflix-backend.onrender.com/api/create-batch",
@@ -59,7 +71,10 @@ function Update() {
       <input
         placeholder="Batch Name"
         value={batchName}
-        onChange={(e)=>setBatchName(e.target.value)}
+        onChange={(e)=>
+          setBatchName(e.target.value)
+        }
+
         style={{
           width:"100%",
           padding:14,
@@ -72,7 +87,10 @@ function Update() {
       <input
         placeholder="Thumbnail URL"
         value={thumbnail}
-        onChange={(e)=>setThumbnail(e.target.value)}
+        onChange={(e)=>
+          setThumbnail(e.target.value)
+        }
+
         style={{
           width:"100%",
           padding:14,
@@ -84,14 +102,20 @@ function Update() {
 
       <input
         type="file"
-        onChange={(e)=>setFile(e.target.files[0])}
+
+        onChange={(e)=>
+          setFile(e.target.files[0])
+        }
+
         style={{
           marginBottom:20
         }}
       />
 
       <button
+
         onClick={createBatch}
+
         style={{
           width:"100%",
           padding:14,
@@ -102,7 +126,9 @@ function Update() {
           fontWeight:"bold"
         }}
       >
+
         Create Batch
+
       </button>
 
     </div>
