@@ -3,30 +3,54 @@ import { useEffect, useState } from "react";
 
 export default function Watch() {
   const router = useRouter();
-
-  const { url } = router.query;
+  const { id } = router.query;
 
   const [videoUrl, setVideoUrl] = useState("");
 
   useEffect(() => {
-    if (!url) return;
+    if (!id) return;
 
-    try {
-      let finalUrl = decodeURIComponent(url);
+    async function loadVideo() {
+      try {
+        const res = await fetch(
+          `https://ppx-d3d205f7.koyeb.app/lecture/${id}`
+        );
 
-      // remove pdf
-      finalUrl = finalUrl.split(".pdf")[0];
+        const data = await res.json();
 
-      // direct player fix
-      if (finalUrl.includes("/play/")) {
-        finalUrl = finalUrl;
+        let finalUrl = "";
+
+        // PDF ignore
+        if (data.pdf_link) {
+          console.log("PDF Ignored");
+        }
+
+        // Direct m3u8
+        if (
+          data.path &&
+          data.path.includes(".m3u8")
+        ) {
+          finalUrl = data.path;
+        }
+
+        // Secure Player
+        else if (
+          data.video_player_url &&
+          data.video_player_token
+        ) {
+          finalUrl =
+            data.video_player_url +
+            data.video_player_token;
+        }
+
+        setVideoUrl(finalUrl);
+      } catch (err) {
+        console.log(err);
       }
-
-      setVideoUrl(finalUrl);
-    } catch (err) {
-      console.log(err);
     }
-  }, [url]);
+
+    loadVideo();
+  }, [id]);
 
   if (!videoUrl) {
     return (
@@ -34,14 +58,14 @@ export default function Watch() {
         style={{
           background: "#000",
           color: "#fff",
-          minHeight: "100vh",
+          height: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           fontSize: "30px",
         }}
       >
-        Loading Video... 😄
+        Loading Player 😄🔥
       </div>
     );
   }
@@ -50,40 +74,16 @@ export default function Watch() {
     <div
       style={{
         background: "#000",
-        minHeight: "100vh",
-        width: "100%",
+        height: "100vh",
       }}
     >
-      {/* Back Button */}
-      <button
-        onClick={() => router.back()}
-        style={{
-          position: "fixed",
-          top: "20px",
-          left: "20px",
-          zIndex: 1000,
-          background: "red",
-          color: "#fff",
-          border: "none",
-          padding: "12px 22px",
-          borderRadius: "15px",
-          fontSize: "20px",
-          fontWeight: "bold",
-        }}
-      >
-        ← Back
-      </button>
-
-      {/* Video */}
       <iframe
         src={videoUrl}
+        width="100%"
+        height="100%"
         allowFullScreen
-        allow="autoplay; encrypted-media"
         style={{
-          width: "100%",
-          height: "100vh",
           border: "none",
-          background: "#000",
         }}
       />
     </div>
