@@ -11,15 +11,21 @@ function Update() {
   const [file, setFile] =
   useState(null);
 
+  const [loading, setLoading] =
+  useState(false);
 
 
-  const createBatch = async () => {
+
+  const createBatch =
+  async () => {
 
     try {
 
       if (!title) {
 
-        alert("Enter Batch Title 😄");
+        alert(
+          "Enter Batch Title 😄"
+        );
 
         return;
 
@@ -27,7 +33,9 @@ function Update() {
 
       if (!thumbnail) {
 
-        alert("Enter Thumbnail URL 😄");
+        alert(
+          "Enter Thumbnail URL 😄"
+        );
 
         return;
 
@@ -35,11 +43,17 @@ function Update() {
 
       if (!file) {
 
-        alert("Select TXT File 😄");
+        alert(
+          "Select TXT File 😄"
+        );
 
         return;
 
       }
+
+
+
+      setLoading(true);
 
 
 
@@ -66,7 +80,7 @@ function Update() {
 
 
 
-        if (parts.length >= 2) {
+        if(parts.length >= 2){
 
           lectures.push({
 
@@ -87,66 +101,62 @@ function Update() {
 
 
 
-      const res =
-      await fetch(
+      const oldBatches =
+      JSON.parse(
 
-        "https://studyflix-backend.onrender.com/create-batch",
-
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":
-            "application/json"
-
-          },
-
-          body: JSON.stringify({
-
-            title,
-
-            thumbnail,
-
-            lectures
-
-          })
-
-        }
+        localStorage.getItem(
+          "batches"
+        ) || "[]"
 
       );
 
 
 
-      const data =
-      await res.json();
+      const newBatch = {
+
+        id:
+        Date.now(),
+
+        title,
+
+        thumbnail,
+
+        lectures
+
+      };
 
 
 
-      if (data.success) {
-
-        alert(
-          "Batch Created 😄🔥"
-        );
+      oldBatches.push(
+        newBatch
+      );
 
 
 
-        window.location.href = "/";
+      localStorage.setItem(
 
-      }
+        "batches",
 
-      else {
+        JSON.stringify(
+          oldBatches
+        )
 
-        alert(
-          "Create Error 😅"
-        );
+      );
 
-      }
+
+
+      alert(
+        "Batch Created 😄🔥"
+      );
+
+
+
+      window.location.href =
+      "/";
 
     }
 
-    catch (err) {
+    catch(err){
 
       console.log(err);
 
@@ -155,6 +165,10 @@ function Update() {
       );
 
     }
+
+
+
+    setLoading(false);
 
   };
 
@@ -192,7 +206,7 @@ function Update() {
 
       >
 
-        StudyFlix Update 😄
+        StudyFlix Update 😄🔥
 
       </h1>
 
@@ -211,9 +225,7 @@ function Update() {
         onChange={(e)=>
 
           setTitle(
-
             e.target.value
-
           )
 
         }
@@ -253,9 +265,7 @@ function Update() {
         onChange={(e)=>
 
           setThumbnail(
-
             e.target.value
-
           )
 
         }
@@ -293,9 +303,7 @@ function Update() {
         onChange={(e)=>
 
           setFile(
-
             e.target.files[0]
-
           )
 
         }
@@ -344,7 +352,15 @@ function Update() {
 
       >
 
-        Create Batch 😄🔥
+        {
+
+          loading
+          ?
+          "Creating..."
+          :
+          "Create Batch 😄🔥"
+
+        }
 
       </button>
 
