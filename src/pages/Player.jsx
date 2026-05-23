@@ -6,6 +6,11 @@ function Player() {
   const [batch, setBatch] =
   useState(null);
 
+  const [folders, setFolders] =
+  useState({});
+
+
+
   useEffect(() => {
 
     const data =
@@ -17,11 +22,94 @@ function Player() {
 
     );
 
+
+
     setBatch(data);
+
+
+
+    if(data){
+
+      const grouped = {};
+
+
+
+      data.lectures.forEach((lecture) => {
+
+        const matches =
+        lecture.title.match(
+          /\((.*?)\)/g
+        );
+
+
+
+        if(!matches) return;
+
+
+
+        const subject =
+        matches[0]
+        ?.replace(/[()]/g,"")
+        || "Other";
+
+
+
+        const type =
+        matches[1]
+        ?.replace(/[()]/g,"")
+        || "Videos";
+
+
+
+        const chapter =
+        matches[2]
+        ?.replace(/[()]/g,"")
+        || "Chapter";
+
+
+
+        if(!grouped[subject]){
+
+          grouped[subject] = {};
+
+        }
+
+
+
+        if(!grouped[subject][type]){
+
+          grouped[subject][type] = {};
+
+        }
+
+
+
+        if(!grouped[subject][type][chapter]){
+
+          grouped[subject][type][chapter] = [];
+
+        }
+
+
+
+        grouped[subject][type][chapter]
+        .push(lecture);
+
+      });
+
+
+
+      setFolders(grouped);
+
+    }
 
   }, []);
 
-  if (!batch) {
+
+
+
+
+  if(!batch){
 
     return (
 
@@ -39,9 +127,7 @@ function Player() {
 
           justifyContent:"center",
 
-          alignItems:"center",
-
-          fontSize:"25px"
+          alignItems:"center"
 
         }}
 
@@ -54,6 +140,8 @@ function Player() {
     );
 
   }
+
+
 
   return (
 
@@ -73,6 +161,8 @@ function Player() {
 
     >
 
+
+
       <button
 
         onClick={() => {
@@ -86,19 +176,17 @@ function Player() {
 
         style={{
 
-          marginBottom:"20px",
-
-          padding:"10px 20px",
-
-          border:"none",
-
-          borderRadius:"10px",
-
           background:"red",
 
           color:"#fff",
 
-          fontSize:"18px"
+          border:"none",
+
+          padding:"10px 20px",
+
+          borderRadius:"10px",
+
+          marginBottom:"20px"
 
         }}
 
@@ -110,15 +198,7 @@ function Player() {
 
 
 
-      <h1
-
-        style={{
-
-          marginBottom:"20px"
-
-        }}
-
-      >
+      <h1>
 
         {batch.title}
 
@@ -128,50 +208,171 @@ function Player() {
 
       {
 
-        batch.lectures.map((lecture) => (
+        Object.keys(folders)
+        .map((subject) => (
 
-          <div
-
-            key={lecture.id}
-
-
-
-            onClick={() => {
-
-              localStorage.setItem(
-
-                "video",
-
-                lecture.video
-
-              );
+          <div key={subject}>
 
 
 
-              window.location.href =
-              "/watch";
+            <h2
 
-            }}
+              style={{
+
+                color:"yellow",
+
+                marginTop:"30px"
+
+              }}
+
+            >
+
+              📚 {subject}
+
+            </h2>
 
 
 
-            style={{
+            {
 
-              background:"#111",
+              Object.keys(
+                folders[subject]
+              ).map((type) => (
 
-              padding:"20px",
+                <div
+                  key={type}
+                >
 
-              borderRadius:"20px",
 
-              marginBottom:"20px",
 
-              cursor:"pointer"
+                  <h3
 
-            }}
+                    style={{
 
-          >
+                      color:"#0ff",
 
-            ▶ {lecture.title}
+                      marginTop:"20px"
+
+                    }}
+
+                  >
+
+                    📂 {type}
+
+                  </h3>
+
+
+
+                  {
+
+                    Object.keys(
+
+                      folders[subject][type]
+
+                    ).map((chapter) => (
+
+                      <div
+
+                        key={chapter}
+
+
+
+                        style={{
+
+                          background:"#111",
+
+                          padding:"20px",
+
+                          borderRadius:"20px",
+
+                          marginTop:"20px"
+
+                        }}
+
+                      >
+
+
+
+                        <h3>
+
+                          📁 {chapter}
+
+                        </h3>
+
+
+
+                        {
+
+                          folders[subject][type][chapter]
+
+                          .map((lecture) => (
+
+                            <div
+
+                              key={lecture.id}
+
+
+
+                              onClick={() => {
+
+                                localStorage.setItem(
+
+                                  "video",
+
+                                  lecture.video
+
+                                );
+
+
+
+                                window.location.href =
+                                "/watch";
+
+                              }}
+
+
+
+                              style={{
+
+                                background:"#222",
+
+                                padding:"15px",
+
+                                borderRadius:"15px",
+
+                                marginTop:"15px",
+
+                                cursor:"pointer"
+
+                              }}
+
+                            >
+
+                              ▶ {
+
+                                lecture.title
+
+                                .replace(/\(.*?\)/g,"")
+
+                              }
+
+                            </div>
+
+                          ))
+
+                        }
+
+                      </div>
+
+                    ))
+
+                  }
+
+                </div>
+
+              ))
+
+            }
 
           </div>
 
@@ -184,5 +385,7 @@ function Player() {
   );
 
 }
+
+
 
 export default Player;
