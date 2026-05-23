@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
 
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [courses, setCourses] =
     useState([]);
@@ -43,7 +43,6 @@ export default function Home() {
       </h1>
 
       {
-
         courses.map((course,index)=>(
 
           <div
@@ -51,8 +50,8 @@ export default function Home() {
             key={index}
 
             onClick={() =>
-              router.push(
-                `/course/${course.id}`
+              navigate(
+                `/player/${course.id}`
               )
             }
 
@@ -99,7 +98,6 @@ export default function Home() {
           </div>
 
         ))
-
       }
 
     </div>
