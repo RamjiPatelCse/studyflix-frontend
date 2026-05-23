@@ -5,106 +5,38 @@ export default function CoursePage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [batch, setBatch] = useState(null);
+  const [course, setCourse] = useState(null);
 
   useEffect(() => {
     if (!id) return;
 
-    const allBatches =
-      JSON.parse(localStorage.getItem("studyflix_batches")) || [];
+    const courses =
+      JSON.parse(localStorage.getItem("courses")) || [];
 
-    const found = allBatches.find(
-      (item) => item.id.toString() === id.toString()
+    const found = courses.find(
+      (item) => item.id == id
     );
 
-    if (found) {
-      setBatch(found);
-    }
+    setCourse(found);
   }, [id]);
 
-  if (!batch) {
+  if (!course) {
     return (
       <div
         style={{
           background: "#000",
           color: "#fff",
-          minHeight: "100vh",
+          height: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          fontSize: "25px",
+          fontSize: "30px",
         }}
       >
-        Loading...
+        Loading 😄
       </div>
     );
   }
-
-  // TXT Parse
-  const lines = batch.content
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const folders = {};
-
-  lines.forEach((line) => {
-    const matches = [...line.matchAll(/\((.*?)\)/g)].map(
-      (m) => m[1]
-    );
-
-    if (matches.length < 3) return;
-
-    const subject = matches[0];
-    const type = matches[1];
-    const chapter = matches[2];
-
-    // Lecture Name
-    let lectureName = line
-      .replace(/\(.*?\)/g, "")
-      .trim();
-
-    // Remove extra :
-    lectureName = lectureName.replace(":", "");
-
-    // URL
-    let url = "";
-
-    if (line.includes("https")) {
-      url = line.substring(line.indexOf("https"));
-
-      // remove pdf
-      url = url.split(".pdf")[0];
-    }
-
-    if (!folders[subject]) {
-      folders[subject] = {};
-    }
-
-    if (!folders[subject][type]) {
-      folders[subject][type] = {};
-    }
-
-    if (!folders[subject][type][chapter]) {
-      folders[subject][type][chapter] = [];
-    }
-
-    folders[subject][type][chapter].push({
-      title: lectureName,
-      url,
-    });
-  });
-
-  const openLecture = (url) => {
-    if (!url) {
-      alert("Video URL Not Found 😭");
-      return;
-    }
-
-    router.push(
-      `/watch?url=${encodeURIComponent(url)}`
-    );
-  };
 
   return (
     <div
@@ -115,15 +47,14 @@ export default function CoursePage() {
         color: "#fff",
       }}
     >
-      {/* Back */}
       <button
         onClick={() => router.back()}
         style={{
           background: "red",
-          border: "none",
           color: "#fff",
+          border: "none",
           padding: "12px 20px",
-          borderRadius: "15px",
+          borderRadius: "12px",
           fontSize: "20px",
           marginBottom: "20px",
         }}
@@ -131,106 +62,94 @@ export default function CoursePage() {
         ← Back
       </button>
 
-      {/* Title */}
       <h1
         style={{
-          fontSize: "45px",
+          fontSize: "42px",
           marginBottom: "30px",
-          fontWeight: "bold",
         }}
       >
-        {batch.title}
+        📚 {course.title}
       </h1>
 
-      {/* Folder Structure */}
-      {Object.keys(folders).map((subject, i) => (
+      {course.subjects?.map((subject, i) => (
         <details
           key={i}
           style={{
-            marginBottom: "20px",
             background: "#111",
-            padding: "15px",
+            padding: "20px",
             borderRadius: "20px",
+            marginBottom: "25px",
           }}
         >
           <summary
             style={{
-              fontSize: "35px",
-              fontWeight: "bold",
+              fontSize: "34px",
               color: "yellow",
             }}
           >
-            📚 {subject}
+            📚 {subject.name}
           </summary>
 
-          {Object.keys(folders[subject]).map(
-            (type, j) => (
+          {/* LIVE */}
+          <details
+            style={{
+              marginTop: "20px",
+              background: "#1a1a1a",
+              padding: "18px",
+              borderRadius: "16px",
+            }}
+          >
+            <summary
+              style={{
+                fontSize: "28px",
+                color: "cyan",
+              }}
+            >
+              📂 Live Class 🔴
+            </summary>
+
+            {subject.topics?.map((topic, idx) => (
               <details
-                key={j}
+                key={idx}
                 style={{
-                  marginTop: "15px",
-                  background: "#000",
-                  padding: "15px",
-                  borderRadius: "15px",
+                  marginTop: "20px",
+                  background: "#222",
+                  padding: "16px",
+                  borderRadius: "16px",
                 }}
               >
                 <summary
                   style={{
-                    fontSize: "28px",
-                    color: "cyan",
-                    fontWeight: "bold",
+                    fontSize: "24px",
                   }}
                 >
-                  📂 {type}
+                  📁 {topic.name}
                 </summary>
 
-                {Object.keys(
-                  folders[subject][type]
-                ).map((chapter, k) => (
-                  <details
-                    key={k}
-                    style={{
-                      marginTop: "15px",
-                      background: "#111",
-                      padding: "15px",
-                      borderRadius: "15px",
-                    }}
-                  >
-                    <summary
+                {topic.lectures?.map(
+                  (lecture, lectureIndex) => (
+                    <div
+                      key={lectureIndex}
+                      onClick={() =>
+                        router.push(
+                          `/watch?id=${lecture.id}`
+                        )
+                      }
                       style={{
-                        fontSize: "25px",
-                        color: "#fff",
-                        fontWeight: "bold",
+                        background: "#333",
+                        padding: "18px",
+                        borderRadius: "14px",
+                        marginTop: "15px",
+                        fontSize: "22px",
                       }}
                     >
-                      📁 {chapter}
-                    </summary>
-
-                    {folders[subject][type][
-                      chapter
-                    ].map((lecture, l) => (
-                      <div
-                        key={l}
-                        onClick={() =>
-                          openLecture(lecture.url)
-                        }
-                        style={{
-                          marginTop: "15px",
-                          background: "#1d1d1d",
-                          padding: "18px",
-                          borderRadius: "15px",
-                          fontSize: "22px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ▶ {lecture.title}
-                      </div>
-                    ))}
-                  </details>
-                ))}
+                      ▶ {lecture.title}
+                    </div>
+                  )
+                )}
               </details>
-            )
-          )}
+            ))}
+          </details>
         </details>
       ))}
     </div>
