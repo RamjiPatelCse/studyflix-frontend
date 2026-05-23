@@ -1,32 +1,55 @@
-import axios from "axios";
-import { useEffect, useState }
-from "react";
-import { useNavigate }
-from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function Home() {
 
-  const [data, setData] =
-  useState({});
-
-  const navigate =
-  useNavigate();
+  const [batches, setBatches] =
+  useState([]);
 
   useEffect(() => {
 
-    loadData();
+    loadBatches();
 
   }, []);
 
-  const loadData =
+  const loadBatches =
   async () => {
 
-    const res =
-    await axios.get(
-      "https://studyflix-backend.onrender.com/api/data"
+    try {
+
+      const res =
+      await fetch(
+
+        "https://studyflix-backend.onrender.com/batches"
+
+      );
+
+      const data =
+      await res.json();
+
+      setBatches(data);
+
+    } catch (err) {
+
+      console.log(err);
+
+    }
+
+  };
+
+  const deleteBatch =
+  async (id) => {
+
+    await fetch(
+
+      `https://studyflix-backend.onrender.com/delete-batch/${id}`,
+
+      {
+        method:"DELETE"
+      }
+
     );
 
-    setData(res.data);
+    loadBatches();
 
   };
 
@@ -36,135 +59,116 @@ function Home() {
       style={{
         background:"#000",
         minHeight:"100vh",
-        color:"#fff",
-        padding:"20px"
+        padding:"20px",
+        color:"#fff"
       }}
     >
 
       <h1
         style={{
-          color:"red"
+          color:"red",
+          marginBottom:"20px"
         }}
       >
-        StudyFlix 😄
+        StudyFlix 😄🔥
       </h1>
 
       {
 
-        Object.keys(data)
-        .map(subject => (
+        batches.map((batch) => (
 
           <div
-            key={subject}
+
+            key={batch.id}
+
             style={{
-              marginTop:"30px"
+              background:"#111",
+              borderRadius:"20px",
+              overflow:"hidden",
+              marginBottom:"20px"
             }}
+
           >
 
-            <h2>
-              📚 {subject}
-            </h2>
+            <img
 
-            {
+              src={batch.thumbnail}
 
-              Object.keys(
-                data[subject]
-              ).map(type => (
+              alt=""
 
-                <div
-                  key={type}
-                  style={{
-                    marginLeft:"20px"
-                  }}
-                >
+              style={{
+                width:"100%",
+                height:"220px",
+                objectFit:"cover"
+              }}
 
-                  <h3>
-                    🔴 {type}
-                  </h3>
+            />
 
-                  {
+            <div
+              style={{
+                padding:"15px"
+              }}
+            >
 
-                    Object.keys(
-                      data[subject][type]
-                    ).map(chapter => (
+              <h2>
+                {batch.title}
+              </h2>
 
-                      <div
-                        key={chapter}
-                        style={{
-                          marginLeft:"20px"
-                        }}
-                      >
+              <button
 
-                        <h4>
-                          ✅ {chapter}
-                        </h4>
+                onClick={() => {
 
-                        {
+                  localStorage.setItem(
 
-                          data[
-                            subject
-                          ][
-                            type
-                          ][
-                            chapter
-                          ].map(lecture => (
+                    "selectedBatch",
 
-                            <div
+                    JSON.stringify(batch)
 
-                              key={
-                                lecture.id
-                              }
+                  );
 
-                              onClick={() =>
-                                navigate(
-                                  `/watch?id=${lecture.id}`
-                                )
-                              }
+                  window.location.href =
+                  "/player";
 
-                              style={{
-                                background:"#111",
-                                padding:"15px",
-                                borderRadius:"20px",
-                                marginBottom:"20px",
-                                cursor:"pointer"
-                              }}
+                }}
 
-                            >
+                style={{
+                  padding:"12px",
+                  border:"none",
+                  borderRadius:"10px",
+                  background:"red",
+                  color:"#fff",
+                  marginRight:"10px",
+                  cursor:"pointer"
+                }}
 
-                              <img
+              >
 
-                                src={
-                                  lecture.thumbnail
-                                }
+                Open
 
-                                style={{
-                                  width:"100%",
-                                  borderRadius:"20px"
-                                }}
+              </button>
 
-                              />
+              <button
 
-                              <h3>
-                                ▶ {lecture.title}
-                              </h3>
+                onClick={() =>
+                  deleteBatch(batch.id)
+                }
 
-                            </div>
+                style={{
+                  padding:"12px",
+                  border:"none",
+                  borderRadius:"10px",
+                  background:"#222",
+                  color:"#fff",
+                  cursor:"pointer"
+                }}
 
-                          ))
+              >
 
-                        }
+                Delete
 
-                      </div>
+              </button>
 
-                    ))
-
-                  }
-
-                </div>
-
-              ))
-
-            }
+            </div>
 
           </div>
 
