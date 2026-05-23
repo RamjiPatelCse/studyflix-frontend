@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom";
 
 export default function Update() {
 
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const [title,setTitle] =
     useState("");
@@ -110,7 +110,7 @@ export default function Update() {
           const nextLine =
             lines[index + 1];
 
-          // PDF IGNORE
+          // PDF HIDE
           if(
             nextLine &&
             nextLine.includes(".pdf")
@@ -177,7 +177,7 @@ export default function Update() {
         "Course Created 😄🔥"
       );
 
-      router.push("/");
+      navigate("/");
 
     }
 
