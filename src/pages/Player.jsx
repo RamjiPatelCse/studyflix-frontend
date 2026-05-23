@@ -9,153 +9,169 @@ function Player() {
   useEffect(() => {
 
     const data =
-    localStorage.getItem(
-      "selectedBatch"
+    JSON.parse(
+
+      localStorage.getItem(
+        "selectedBatch"
+      )
+
     );
 
-    if (data) {
-
-      setBatch(
-        JSON.parse(data)
-      );
-
-    }
+    setBatch(data);
 
   }, []);
 
   if (!batch) {
 
-    return <h1>No Batch</h1>;
+    return (
+
+      <div
+
+        style={{
+
+          background:"#000",
+
+          color:"#fff",
+
+          height:"100vh",
+
+          display:"flex",
+
+          justifyContent:"center",
+
+          alignItems:"center",
+
+          fontSize:"25px"
+
+        }}
+
+      >
+
+        Loading 😄🔥
+
+      </div>
+
+    );
 
   }
 
   return (
 
     <div
+
       style={{
-        background:"#111",
+
+        background:"#000",
+
         minHeight:"100vh",
-        color:"white",
-        padding:20
+
+        padding:"20px",
+
+        color:"#fff"
+
       }}
+
     >
 
-      <h1
-        style={{
-          color:"red",
-          marginBottom:20
+      <button
+
+        onClick={() => {
+
+          window.location.href =
+          "/";
+
         }}
+
+
+
+        style={{
+
+          marginBottom:"20px",
+
+          padding:"10px 20px",
+
+          border:"none",
+
+          borderRadius:"10px",
+
+          background:"red",
+
+          color:"#fff",
+
+          fontSize:"18px"
+
+        }}
+
       >
-        {batch.batchName}
+
+        ← Back
+
+      </button>
+
+
+
+      <h1
+
+        style={{
+
+          marginBottom:"20px"
+
+        }}
+
+      >
+
+        {batch.title}
+
       </h1>
+
+
 
       {
 
-        Object.keys(batch.folders)
-        .map((subject, index) => (
+        batch.lectures.map((lecture) => (
 
           <div
-            key={index}
-            style={{
-              marginBottom:30
+
+            key={lecture.id}
+
+
+
+            onClick={() => {
+
+              localStorage.setItem(
+
+                "video",
+
+                lecture.video
+
+              );
+
+
+
+              window.location.href =
+              "/watch";
+
             }}
+
+
+
+            style={{
+
+              background:"#111",
+
+              padding:"20px",
+
+              borderRadius:"20px",
+
+              marginBottom:"20px",
+
+              cursor:"pointer"
+
+            }}
+
           >
 
-            <h2
-              style={{
-                color:"yellow"
-              }}
-            >
-              📚 {subject}
-            </h2>
-
-            {
-
-              Object.keys(
-                batch.folders[subject]
-              ).map((chapter, i) => (
-
-                <div
-
-                  key={i}
-
-                  style={{
-                    background:"#1b1b1b",
-                    padding:15,
-                    borderRadius:15,
-                    marginTop:15
-                  }}
-                >
-
-                  <h3>
-                    📁 {chapter}
-                  </h3>
-
-                  {
-
-                    batch
-                    .folders[subject][chapter]
-                    .map((lecture, j) => (
-
-                      <div
-
-                        key={j}
-
-                        onClick={() => {
-
-                          window.location.href =
-                          `/watch?id=${lecture.id}`;
-
-                        }}
-
-                        style={{
-                          background:"#222",
-                          borderRadius:15,
-                          overflow:"hidden",
-                          marginTop:15,
-                          cursor:"pointer"
-                        }}
-                      >
-
-                        <img
-
-                          src={
-                            lecture.thumbnail
-                          }
-
-                          alt=""
-
-                          style={{
-                            width:"100%",
-                            height:180,
-                            objectFit:"cover"
-                          }}
-
-                        />
-
-                        <div
-                          style={{
-                            padding:15
-                          }}
-                        >
-
-                          <h3>
-                            ▶ {lecture.title}
-                          </h3>
-
-                        </div>
-
-                      </div>
-
-                    ))
-
-                  }
-
-                </div>
-
-              ))
-
-            }
+            ▶ {lecture.title}
 
           </div>
 
