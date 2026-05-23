@@ -18,14 +18,17 @@ function Update() {
   const createBatch =
   async () => {
 
-    if (!file) {
-
-      alert("Select TXT File 😄");
-      return;
-
-    }
-
     try {
+
+      if (!file) {
+
+        alert(
+          "Select TXT File 😄"
+        );
+
+        return;
+
+      }
 
       setLoading(true);
 
@@ -39,17 +42,22 @@ function Update() {
 
         {
 
+          batchName:
           batchName,
 
+          thumbnail:
           thumbnail,
 
+          text:
           text
 
         }
 
       );
 
-      console.log(response.data);
+      console.log(
+        response.data
+      );
 
       if (
         response.data.success
@@ -84,78 +92,60 @@ function Update() {
   return (
 
     <div
-
       style={{
-
         background:"#000",
         minHeight:"100vh",
         padding:"30px",
         color:"#fff"
-
       }}
-
     >
 
       <h1
-
         style={{
-
           color:"red"
-
         }}
-
       >
-
         StudyFlix Update 😄
-
       </h1>
 
       <input
 
+        placeholder="Batch Name"
+
         value={batchName}
 
-        onChange={(e) =>
+        onChange={(e)=>
           setBatchName(
             e.target.value
           )
         }
 
-        placeholder="Batch Name"
-
         style={{
-
           width:"100%",
           padding:"20px",
           borderRadius:"20px",
-          border:"none",
-          marginTop:"20px",
-          fontSize:"18px"
-
+          marginTop:"20px"
         }}
 
       />
 
       <input
 
+        placeholder="Thumbnail URL"
+
         value={thumbnail}
 
-        onChange={(e) =>
+        onChange={(e)=>
           setThumbnail(
             e.target.value
           )
         }
 
-        placeholder="Thumbnail URL"
-
         style={{
-
           width:"100%",
           padding:"20px",
           borderRadius:"20px",
-          border:"none",
-          marginTop:"20px",
-          fontSize:"18px"
-
+          marginTop:"20px"
         }}
 
       />
@@ -166,17 +156,14 @@ function Update() {
 
         accept=".txt"
 
-        onChange={(e) =>
+        onChange={(e)=>
           setFile(
             e.target.files[0]
           )
         }
 
         style={{
-
-          marginTop:"30px",
-          color:"#fff"
-
+          marginTop:"20px"
         }}
 
       />
@@ -186,17 +173,13 @@ function Update() {
         onClick={createBatch}
 
         style={{
-
           width:"100%",
           padding:"20px",
-          borderRadius:"20px",
-          border:"none",
           background:"red",
           color:"#fff",
-          marginTop:"30px",
-          fontSize:"20px",
-          cursor:"pointer"
-
+          border:"none",
+          borderRadius:"20px",
+          marginTop:"30px"
         }}
 
       >
