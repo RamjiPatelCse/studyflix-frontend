@@ -2,33 +2,70 @@ import { useState } from "react";
 
 function Update() {
 
-  const [title, setTitle] =
-  useState("");
+  const [title, setTitle] = useState("");
 
   const [thumbnail, setThumbnail] =
   useState("");
 
-  const [text, setText] =
-  useState("");
+  const [file, setFile] =
+  useState(null);
 
-  const createBatch =
-  async () => {
+
+
+  const createBatch = async () => {
 
     try {
 
+      if (!title) {
+
+        alert("Enter Batch Title 😄");
+
+        return;
+
+      }
+
+      if (!thumbnail) {
+
+        alert("Enter Thumbnail URL 😄");
+
+        return;
+
+      }
+
+      if (!file) {
+
+        alert("Select TXT File 😄");
+
+        return;
+
+      }
+
+
+
+      const text =
+      await file.text();
+
+
+
       const lectures = [];
+
+
 
       const lines =
       text
       .split("\n")
       .filter(x => x.trim());
 
+
+
       lines.forEach((line, index) => {
 
         const parts =
         line.split(": ");
 
-        if(parts.length >= 2){
+
+
+        if (parts.length >= 2) {
 
           lectures.push({
 
@@ -47,6 +84,8 @@ function Update() {
 
       });
 
+
+
       const res =
       await fetch(
 
@@ -54,13 +93,16 @@ function Update() {
 
         {
 
-          method:"POST",
+          method: "POST",
 
-          headers:{
-            "Content-Type":"application/json"
+          headers: {
+
+            "Content-Type":
+            "application/json"
+
           },
 
-          body:JSON.stringify({
+          body: JSON.stringify({
 
             title,
 
@@ -74,22 +116,40 @@ function Update() {
 
       );
 
+
+
       const data =
       await res.json();
 
-      if(data.success){
+
+
+      if (data.success) {
 
         alert(
           "Batch Created 😄🔥"
         );
 
+
+
         setTitle("");
+
         setThumbnail("");
-        setText("");
+
+        setFile(null);
 
       }
 
-    } catch(err){
+      else {
+
+        alert(
+          "Create Error 😅"
+        );
+
+      }
+
+    }
+
+    catch (err) {
 
       console.log(err);
 
@@ -101,106 +161,216 @@ function Update() {
 
   };
 
+
+
   return (
 
     <div
+
       style={{
+
         background:"#000",
+
         minHeight:"100vh",
+
         padding:"20px",
+
         color:"#fff"
+
       }}
+
     >
 
+
+
       <h1
+
         style={{
-          color:"red"
+
+          color:"red",
+
+          marginBottom:"20px"
+
         }}
+
       >
-        Update Panel 😄🔥
+
+        StudyFlix Update 😄
+
       </h1>
+
+
 
       <input
 
         placeholder="Batch Title"
 
+
+
         value={title}
 
+
+
         onChange={(e)=>
+
           setTitle(
+
             e.target.value
+
           )
+
         }
 
+
+
         style={{
+
           width:"100%",
-          padding:"15px",
-          borderRadius:"12px",
-          marginTop:"20px",
-          border:"none"
+
+          padding:"18px",
+
+          borderRadius:"20px",
+
+          border:"3px solid #333",
+
+          marginBottom:"20px",
+
+          fontSize:"20px"
+
         }}
 
       />
+
+
 
       <input
 
         placeholder="Thumbnail URL"
 
+
+
         value={thumbnail}
 
+
+
         onChange={(e)=>
+
           setThumbnail(
+
             e.target.value
+
           )
+
         }
 
+
+
         style={{
+
           width:"100%",
-          padding:"15px",
-          borderRadius:"12px",
-          marginTop:"20px",
-          border:"none"
+
+          padding:"18px",
+
+          borderRadius:"20px",
+
+          border:"3px solid #333",
+
+          marginBottom:"20px",
+
+          fontSize:"20px"
+
         }}
 
       />
+
+
+
+      <input
+
+        type="file"
+
+        accept=".txt"
+
+
+
+        onChange={(e)=>
+
+          setFile(
+
+            e.target.files[0]
+
+          )
+
+        }
+
+
+
+        style={{
+
+          marginBottom:"20px",
+
+          color:"#fff",
+
+          fontSize:"18px"
+
+        }}
+
+      />
+
+
 
       <textarea
 
         placeholder="Paste TXT Content"
 
-        value={text}
 
-        onChange={(e)=>
-          setText(
-            e.target.value
-          )
-        }
 
         style={{
+
           width:"100%",
-          height:"300px",
-          padding:"15px",
-          borderRadius:"12px",
-          marginTop:"20px",
-          border:"none"
+
+          height:"350px",
+
+          padding:"20px",
+
+          borderRadius:"20px",
+
+          border:"3px solid #333",
+
+          marginBottom:"20px",
+
+          fontSize:"18px"
+
         }}
 
       />
+
+
 
       <button
 
         onClick={createBatch}
 
+
+
         style={{
+
           width:"100%",
-          padding:"15px",
-          borderRadius:"12px",
-          marginTop:"20px",
+
+          padding:"20px",
+
           border:"none",
+
+          borderRadius:"20px",
+
           background:"red",
+
           color:"#fff",
-          fontSize:"18px",
+
+          fontSize:"22px",
+
           cursor:"pointer"
+
         }}
 
       >
@@ -214,5 +384,7 @@ function Update() {
   );
 
 }
+
+
 
 export default Update;
