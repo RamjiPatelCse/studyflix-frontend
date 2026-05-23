@@ -2,7 +2,8 @@ import { useState } from "react";
 
 function Update() {
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] =
+  useState("");
 
   const [thumbnail, setThumbnail] =
   useState("");
@@ -131,11 +132,7 @@ function Update() {
 
 
 
-        setTitle("");
-
-        setThumbnail("");
-
-        setFile(null);
+        window.location.href = "/";
 
       }
 
@@ -310,34 +307,6 @@ function Update() {
           marginBottom:"20px",
 
           color:"#fff",
-
-          fontSize:"18px"
-
-        }}
-
-      />
-
-
-
-      <textarea
-
-        placeholder="Paste TXT Content"
-
-
-
-        style={{
-
-          width:"100%",
-
-          height:"350px",
-
-          padding:"20px",
-
-          borderRadius:"20px",
-
-          border:"3px solid #333",
-
-          marginBottom:"20px",
 
           fontSize:"18px"
 
