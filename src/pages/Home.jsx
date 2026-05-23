@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState }
+from "react";
+
 import axios from "axios";
 
 function Home() {
 
-  const [batches, setBatches] = useState([]);
+  const [batches, setBatches] =
+  useState([]);
 
   useEffect(() => {
 
@@ -11,21 +14,19 @@ function Home() {
 
   }, []);
 
-  const getBatches = async () => {
+  const getBatches =
+  async () => {
 
-    try {
+    const response =
+    await axios.get(
 
-      const response = await axios.get(
-        "https://studyflix-backend.onrender.com/api/batches"
-      );
+      "https://studyflix-backend.onrender.com/api/batches"
 
-      setBatches(response.data.batches);
+    );
 
-    } catch (error) {
-
-      console.log(error);
-
-    }
+    setBatches(
+      response.data.batches
+    );
 
   };
 
@@ -33,8 +34,8 @@ function Home() {
 
     <div
       style={{
-        minHeight:"100vh",
         background:"#111",
+        minHeight:"100vh",
         padding:20,
         color:"white"
       }}
@@ -50,57 +51,73 @@ function Home() {
       </h1>
 
       {
-        batches.map((batch, index) => (
+
+        batches.map((batch) => (
 
           <div
-            key={index}
+
+            key={batch.id}
 
             onClick={() => {
 
               localStorage.setItem(
+
                 "selectedBatch",
+
                 JSON.stringify(batch)
+
               );
 
-              window.location.href = "/player";
+              window.location.href =
+              "/player";
 
             }}
 
             style={{
               background:"#1b1b1b",
-              padding:15,
-              borderRadius:15,
+              borderRadius:20,
+              overflow:"hidden",
               marginBottom:20,
               cursor:"pointer"
             }}
           >
 
             <img
+
               src={batch.thumbnail}
+
               alt=""
+
               style={{
                 width:"100%",
-                borderRadius:12,
-                marginBottom:15
+                height:220,
+                objectFit:"cover"
               }}
+
             />
 
-            <h2>
-              {batch.batchName}
-            </h2>
+            <div
+              style={{
+                padding:15
+              }}
+            >
 
-            <p>
-              Lectures:
-              {batch.lectures.length}
-            </p>
+              <h2>
+                {batch.batchName}
+              </h2>
+
+            </div>
 
           </div>
 
         ))
+
       }
 
     </div>
+
   );
+
 }
 
 export default Home;
