@@ -1,91 +1,103 @@
 import { useState } from "react";
-import axios from "axios";
 
 function Update() {
 
-  const [batchName, setBatchName] =
+  const [title, setTitle] =
   useState("");
 
   const [thumbnail, setThumbnail] =
   useState("");
 
-  const [file, setFile] =
-  useState(null);
-
-  const [loading, setLoading] =
-  useState(false);
+  const [text, setText] =
+  useState("");
 
   const createBatch =
   async () => {
 
     try {
 
-      if (!file) {
+      const lectures = [];
 
-        alert(
-          "Select TXT File 😄"
-        );
+      const lines =
+      text
+      .split("\n")
+      .filter(x => x.trim());
 
-        return;
+      lines.forEach((line, index) => {
 
-      }
+        const parts =
+        line.split(": ");
 
-      setLoading(true);
+        if(parts.length >= 2){
 
-      const text =
-      await file.text();
+          lectures.push({
 
-      const response =
-      await axios.post(
+            id:
+            Date.now() + index,
 
-        "https://studyflix-backend.onrender.com/api/upload",
+            title:
+            parts[0],
+
+            video:
+            parts.slice(1).join(": ")
+
+          });
+
+        }
+
+      });
+
+      const res =
+      await fetch(
+
+        "https://studyflix-backend.onrender.com/create-batch",
 
         {
 
-          batchName:
-          batchName,
+          method:"POST",
 
-          thumbnail:
-          thumbnail,
+          headers:{
+            "Content-Type":"application/json"
+          },
 
-          text:
-          text
+          body:JSON.stringify({
+
+            title,
+
+            thumbnail,
+
+            lectures
+
+          })
 
         }
 
       );
 
-      console.log(
-        response.data
-      );
+      const data =
+      await res.json();
 
-      if (
-        response.data.success
-      ) {
+      if(data.success){
 
         alert(
           "Batch Created 😄🔥"
         );
 
-      } else {
-
-        alert(
-          "Create Error 😄"
-        );
+        setTitle("");
+        setThumbnail("");
+        setText("");
 
       }
 
-    } catch (error) {
+    } catch(err){
 
-      console.log(error);
+      console.log(err);
 
       alert(
-        "Server Error 😄"
+        "Server Error 😅"
       );
 
     }
-
-    setLoading(false);
 
   };
 
@@ -95,7 +107,7 @@ function Update() {
       style={{
         background:"#000",
         minHeight:"100vh",
-        padding:"30px",
+        padding:"20px",
         color:"#fff"
       }}
     >
@@ -105,26 +117,27 @@ function Update() {
           color:"red"
         }}
       >
-        StudyFlix Update 😄
+        Update Panel 😄🔥
       </h1>
 
       <input
 
-        placeholder="Batch Name"
+        placeholder="Batch Title"
 
-        value={batchName}
+        value={title}
 
         onChange={(e)=>
-          setBatchName(
+          setTitle(
             e.target.value
           )
         }
 
         style={{
           width:"100%",
-          padding:"20px",
-          borderRadius:"20px",
-          marginTop:"20px"
+          padding:"15px",
+          borderRadius:"12px",
+          marginTop:"20px",
+          border:"none"
         }}
 
       />
@@ -143,27 +156,33 @@ function Update() {
 
         style={{
           width:"100%",
-          padding:"20px",
-          borderRadius:"20px",
-          marginTop:"20px"
+          padding:"15px",
+          borderRadius:"12px",
+          marginTop:"20px",
+          border:"none"
         }}
 
       />
 
-      <input
+      <textarea
 
-        type="file"
+        placeholder="Paste TXT Content"
 
-        accept=".txt"
+        value={text}
 
         onChange={(e)=>
-          setFile(
-            e.target.files[0]
+          setText(
+            e.target.value
           )
         }
 
         style={{
-          marginTop:"20px"
+          width:"100%",
+          height:"300px",
+          padding:"15px",
+          borderRadius:"12px",
+          marginTop:"20px",
+          border:"none"
         }}
 
       />
@@ -174,25 +193,19 @@ function Update() {
 
         style={{
           width:"100%",
-          padding:"20px",
+          padding:"15px",
+          borderRadius:"12px",
+          marginTop:"20px",
+          border:"none",
           background:"red",
           color:"#fff",
-          border:"none",
-          borderRadius:"20px",
-          marginTop:"30px"
+          fontSize:"18px",
+          cursor:"pointer"
         }}
 
       >
 
-        {
-
-          loading
-          ?
-          "Creating..."
-          :
-          "Create Batch"
-
-        }
+        Create Batch 😄🔥
 
       </button>
 
