@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useState
-}
-from "react";
-
+import { useState } from "react";
 import axios from "axios";
 
 function Update() {
@@ -17,151 +12,150 @@ function Update() {
   const [file, setFile] =
   useState(null);
 
-  const [batches, setBatches] =
-  useState([]);
-
-  useEffect(() => {
-
-    getBatches();
-
-  }, []);
-
-  const getBatches =
-  async () => {
-
-    const response =
-    await axios.get(
-
-      "https://studyflix-backend.onrender.com/api/batches"
-
-    );
-
-    setBatches(
-      response.data.batches
-    );
-
-  };
+  const [loading, setLoading] =
+  useState(false);
 
   const createBatch =
   async () => {
 
+    if (!file) {
+
+      alert("Select TXT File 😄");
+      return;
+
+    }
+
     try {
 
-      const formData =
-      new FormData();
+      setLoading(true);
 
-      formData.append(
-        "batchName",
-        batchName
-      );
+      const text =
+      await file.text();
 
-      formData.append(
-        "thumbnail",
-        thumbnail
-      );
-
-      formData.append(
-        "txt",
-        file
-      );
-
+      const response =
       await axios.post(
 
-        "https://studyflix-backend.onrender.com/api/create-batch",
+        "https://studyflix-backend.onrender.com/api/upload",
 
-        formData
+        {
+
+          batchName,
+
+          thumbnail,
+
+          text
+
+        }
 
       );
 
-      alert(
-        "Batch Created 😄"
-      );
+      console.log(response.data);
 
-      getBatches();
+      if (
+        response.data.success
+      ) {
+
+        alert(
+          "Batch Created 😄🔥"
+        );
+
+      } else {
+
+        alert(
+          "Create Error 😄"
+        );
+
+      }
 
     } catch (error) {
 
+      console.log(error);
+
       alert(
-        "Create Error"
+        "Server Error 😄"
       );
 
     }
 
-  };
-
-  const deleteBatch =
-  async (id) => {
-
-    await axios.delete(
-
-      `https://studyflix-backend.onrender.com/api/delete-batch/${id}`
-
-    );
-
-    getBatches();
+    setLoading(false);
 
   };
 
   return (
 
     <div
+
       style={{
-        background:"#111",
+
+        background:"#000",
         minHeight:"100vh",
-        padding:20,
-        color:"white"
+        padding:"30px",
+        color:"#fff"
+
       }}
+
     >
 
       <h1
+
         style={{
-          color:"red",
-          marginBottom:20
+
+          color:"red"
+
         }}
+
       >
+
         StudyFlix Update 😄
+
       </h1>
 
       <input
 
-        placeholder="Batch Name"
-
         value={batchName}
 
-        onChange={(e)=>
+        onChange={(e) =>
           setBatchName(
             e.target.value
           )
         }
 
+        placeholder="Batch Name"
+
         style={{
+
           width:"100%",
-          padding:14,
-          marginBottom:15,
-          borderRadius:10,
-          border:"none"
+          padding:"20px",
+          borderRadius:"20px",
+          border:"none",
+          marginTop:"20px",
+          fontSize:"18px"
+
         }}
 
       />
 
       <input
 
-        placeholder="Thumbnail URL"
-
         value={thumbnail}
 
-        onChange={(e)=>
+        onChange={(e) =>
           setThumbnail(
             e.target.value
           )
         }
 
+        placeholder="Thumbnail URL"
+
         style={{
+
           width:"100%",
-          padding:14,
-          marginBottom:15,
-          borderRadius:10,
-          border:"none"
+          padding:"20px",
+          borderRadius:"20px",
+          border:"none",
+          marginTop:"20px",
+          fontSize:"18px"
+
         }}
 
       />
@@ -170,14 +164,19 @@ function Update() {
 
         type="file"
 
-        onChange={(e)=>
+        accept=".txt"
+
+        onChange={(e) =>
           setFile(
             e.target.files[0]
           )
         }
 
         style={{
-          marginBottom:20
+
+          marginTop:"30px",
+          color:"#fff"
+
         }}
 
       />
@@ -187,69 +186,32 @@ function Update() {
         onClick={createBatch}
 
         style={{
+
           width:"100%",
-          padding:14,
-          background:"red",
-          color:"white",
+          padding:"20px",
+          borderRadius:"20px",
           border:"none",
-          borderRadius:10,
-          fontWeight:"bold"
+          background:"red",
+          color:"#fff",
+          marginTop:"30px",
+          fontSize:"20px",
+          cursor:"pointer"
+
         }}
 
       >
 
-        Create Batch
+        {
+
+          loading
+          ?
+          "Creating..."
+          :
+          "Create Batch"
+
+        }
 
       </button>
-
-      <br/><br/>
-
-      {
-
-        batches.map((batch) => (
-
-          <div
-
-            key={batch.id}
-
-            style={{
-              background:"#1b1b1b",
-              padding:15,
-              borderRadius:15,
-              marginBottom:15
-            }}
-          >
-
-            <h3>
-              {batch.batchName}
-            </h3>
-
-            <button
-
-              onClick={() =>
-                deleteBatch(batch.id)
-              }
-
-              style={{
-                marginTop:10,
-                padding:10,
-                background:"red",
-                color:"white",
-                border:"none",
-                borderRadius:10
-              }}
-
-            >
-
-              Delete Batch
-
-            </button>
-
-          </div>
-
-        ))
-
-      }
 
     </div>
 
