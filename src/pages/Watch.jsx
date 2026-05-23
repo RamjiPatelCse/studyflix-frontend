@@ -1,14 +1,28 @@
-import { useRouter } from "next/router";
+import { useLocation } from "react-router-dom";
 
-export default function Watch(){
+export default function Watch() {
 
-  const router = useRouter();
+  const location = useLocation();
 
-  const { url } = router.query;
+  const params =
+    new URLSearchParams(
+      location.search
+    );
+
+  const url =
+    params.get("url");
 
   if(!url){
 
-    return <h1>Loading...</h1>;
+    return (
+      <h1
+        style={{
+          color:"#fff"
+        }}
+      >
+        Loading...
+      </h1>
+    );
 
   }
 
@@ -35,5 +49,4 @@ export default function Watch(){
     />
 
   );
-
 }
