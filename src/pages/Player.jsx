@@ -1,193 +1,85 @@
-import { useEffect, useState }
-from "react";
+import {
+  useNavigate,
+  useParams
+} from "react-router-dom";
 
-function Player() {
+import {
+  useEffect,
+  useState
+} from "react";
 
-  const [batch, setBatch] =
-  useState(null);
+export default function Player(){
 
-  const [folders, setFolders] =
-  useState({});
+  const navigate = useNavigate();
 
+  const { id } = useParams();
 
+  const [course,setCourse] =
+    useState(null);
 
-  useEffect(() => {
+  useEffect(()=>{
 
-    const data =
-    JSON.parse(
+    const courses =
+      JSON.parse(
+        localStorage.getItem(
+          "courses"
+        ) || "[]"
+      );
 
-      localStorage.getItem(
-        "selectedBatch"
-      )
+    const found =
+      courses.find(
+        item => item.id == id
+      );
 
-    );
+    setCourse(found);
 
+  },[id]);
 
+  if(!course){
 
-    setBatch(data);
-
-
-
-    if(data){
-
-      const grouped = {};
-
-
-
-      data.lectures.forEach((lecture) => {
-
-        const matches =
-        lecture.title.match(
-          /\((.*?)\)/g
-        );
-
-
-
-        if(!matches) return;
-
-
-
-        const subject =
-        matches[0]
-        ?.replace(/[()]/g,"")
-        || "Other";
-
-
-
-        const type =
-        matches[1]
-        ?.replace(/[()]/g,"")
-        || "Videos";
-
-
-
-        const chapter =
-        matches[2]
-        ?.replace(/[()]/g,"")
-        || "Chapter";
-
-
-
-        if(!grouped[subject]){
-
-          grouped[subject] = {};
-
-        }
-
-
-
-        if(!grouped[subject][type]){
-
-          grouped[subject][type] = {};
-
-        }
-
-
-
-        if(!grouped[subject][type][chapter]){
-
-          grouped[subject][type][chapter] = [];
-
-        }
-
-
-
-        grouped[subject][type][chapter]
-        .push(lecture);
-
-      });
-
-
-
-      setFolders(grouped);
-
-    }
-
-  }, []);
-
-
-
-
-
-  if(!batch){
-
-    return (
+    return(
 
       <div
-
         style={{
-
           background:"#000",
-
           color:"#fff",
-
           height:"100vh",
-
           display:"flex",
-
           justifyContent:"center",
-
           alignItems:"center"
-
         }}
-
       >
-
         Loading 😄🔥
-
       </div>
 
     );
 
   }
 
-
-
-  return (
+  return(
 
     <div
-
       style={{
-
         background:"#000",
-
         minHeight:"100vh",
-
         padding:"20px",
-
         color:"#fff"
-
       }}
-
     >
-
-
 
       <button
 
-        onClick={() => {
-
-          window.location.href =
-          "/";
-
-        }}
-
-
+        onClick={() =>
+          navigate(-1)
+        }
 
         style={{
-
           background:"red",
-
           color:"#fff",
-
           border:"none",
-
-          padding:"10px 20px",
-
-          borderRadius:"10px",
-
+          padding:"12px 20px",
+          borderRadius:"15px",
           marginBottom:"20px"
-
         }}
 
       >
@@ -196,171 +88,89 @@ function Player() {
 
       </button>
 
-
-
-      <h1>
-
-        {batch.title}
-
+      <h1
+        style={{
+          fontSize:"40px",
+          marginBottom:"30px"
+        }}
+      >
+        {course.title}
       </h1>
-
-
 
       {
 
-        Object.keys(folders)
-        .map((subject) => (
+        course.subjects.map((subject,i)=>(
 
-          <div key={subject}>
+          <details
+            key={i}
+            style={{
+              background:"#111",
+              padding:"20px",
+              borderRadius:"20px",
+              marginBottom:"20px"
+            }}
+          >
 
-
-
-            <h2
-
+            <summary
               style={{
-
-                color:"yellow",
-
-                marginTop:"30px"
-
+                fontSize:"32px",
+                color:"yellow"
               }}
-
             >
-
-              📚 {subject}
-
-            </h2>
-
-
+              📚 {subject.name}
+            </summary>
 
             {
 
-              Object.keys(
-                folders[subject]
-              ).map((type) => (
+              subject.topics.map((topic,j)=>(
 
-                <div
-                  key={type}
+                <details
+                  key={j}
+                  style={{
+                    marginTop:"20px",
+                    background:"#222",
+                    padding:"18px",
+                    borderRadius:"18px"
+                  }}
                 >
 
-
-
-                  <h3
-
+                  <summary
                     style={{
-
-                      color:"#0ff",
-
-                      marginTop:"20px"
-
+                      fontSize:"25px",
+                      color:"cyan"
                     }}
-
                   >
-
-                    📂 {type}
-
-                  </h3>
-
-
+                    📂 {topic.name}
+                  </summary>
 
                   {
 
-                    Object.keys(
-
-                      folders[subject][type]
-
-                    ).map((chapter) => (
+                    topic.lectures.map((lecture,k)=>(
 
                       <div
 
-                        key={chapter}
+                        key={k}
 
-
+                        onClick={() =>
+                          navigate(
+                            `/watch?url=${encodeURIComponent(
+                              lecture.url
+                            )}`
+                          )
+                        }
 
                         style={{
-
-                          background:"#111",
-
-                          padding:"20px",
-
-                          borderRadius:"20px",
-
-                          marginTop:"20px"
-
+                          background:"#333",
+                          padding:"18px",
+                          borderRadius:"15px",
+                          marginTop:"15px",
+                          fontSize:"22px",
+                          cursor:"pointer"
                         }}
 
                       >
 
-
-
-                        <h3>
-
-                          📁 {chapter}
-
-                        </h3>
-
-
-
-                        {
-
-                          folders[subject][type][chapter]
-
-                          .map((lecture) => (
-
-                            <div
-
-                              key={lecture.id}
-
-
-
-                              onClick={() => {
-
-                                localStorage.setItem(
-
-                                  "video",
-
-                                  lecture.video
-
-                                );
-
-
-
-                                window.location.href =
-                                "/watch";
-
-                              }}
-
-
-
-                              style={{
-
-                                background:"#222",
-
-                                padding:"15px",
-
-                                borderRadius:"15px",
-
-                                marginTop:"15px",
-
-                                cursor:"pointer"
-
-                              }}
-
-                            >
-
-                              ▶ {
-
-                                lecture.title
-
-                                .replace(/\(.*?\)/g,"")
-
-                              }
-
-                            </div>
-
-                          ))
-
-                        }
+                        ▶ {lecture.title}
 
                       </div>
 
@@ -368,13 +178,13 @@ function Player() {
 
                   }
 
-                </div>
+                </details>
 
               ))
 
             }
 
-          </div>
+          </details>
 
         ))
 
@@ -385,7 +195,3 @@ function Player() {
   );
 
 }
-
-
-
-export default Player;
