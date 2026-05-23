@@ -18,17 +18,17 @@ export default function Update() {
   async () => {
 
     if(!title){
-      alert("Enter Title 😄");
+      alert("Enter Title");
       return;
     }
 
     if(!thumbnail){
-      alert("Enter Thumbnail 😄");
+      alert("Enter Thumbnail");
       return;
     }
 
     if(!file){
-      alert("Select TXT 😄");
+      alert("Select TXT");
       return;
     }
 
@@ -43,102 +43,118 @@ export default function Update() {
         .map(x => x.trim())
         .filter(Boolean);
 
-      let subjects = [];
+      const subjectsMap = {};
 
-      let currentSubject = null;
+      lines.forEach((line) => {
 
-      let currentTopic = null;
-
-      lines.forEach((line,index)=>{
-
-        // SUBJECT
-        if(
-          line.startsWith("📚")
-        ){
-
-          currentSubject = {
-
-            name:
-            line.replace(
-              "📚",
-              ""
-            ).trim(),
-
-            topics:[]
-
-          };
-
-          subjects.push(
-            currentSubject
-          );
-
+        // PDF HIDE
+        if (
+          line.includes(".pdf")
+        ) {
+          return;
         }
 
-        // TOPIC
-        else if(
-          line.startsWith("📂")
-        ){
+        // VIDEO
+        if (
+          line.includes("VC:")
+        ) {
 
-          currentTopic = {
+          const parts =
+            line.split("VC:");
 
-            name:
-            line.replace(
-              "📂",
-              ""
-            ).trim(),
+          const left =
+            parts[0];
 
-            lectures:[]
+          const url =
+            parts[1]?.trim();
 
-          };
+          const matches =
+            left.match(
+              /\((.*?)\)/g
+            );
 
-          currentSubject?.topics
-          .push(currentTopic);
+          if (!matches) return;
 
-        }
+          const subject =
+            matches[0]
+            ?.replace(/[()]/g,"")
+            .trim();
 
-        // LECTURE
-        else if(
-          line.startsWith("▶")
-        ){
+          const topic =
+            matches[2]
+            ?.replace(/[()]/g,"")
+            .trim();
 
-          const lectureTitle =
-            line.replace(
-              "▶",
-              ""
-            ).trim();
+          const lecture =
+            left
+            .split(")")
+            .pop()
+            .replace(":","")
+            .trim();
 
-          const nextLine =
-            lines[index + 1];
+          if (
+            !subjectsMap[
+              subject
+            ]
+          ) {
 
-          // PDF HIDE
-          if(
-            nextLine &&
-            nextLine.includes(".pdf")
-          ){
-            return;
-          }
+            subjectsMap[
+              subject
+            ] = {
 
-          if(
-            nextLine &&
-            nextLine.startsWith("http")
-          ){
+              name: subject,
 
-            currentTopic?.lectures
-            .push({
+              topics: []
 
-              title:
-              lectureTitle,
-
-              url:
-              nextLine
-
-            });
+            };
 
           }
+
+          let existingTopic =
+            subjectsMap[
+              subject
+            ].topics.find(
+              t =>
+              t.name === topic
+            );
+
+          if (
+            !existingTopic
+          ) {
+
+            existingTopic = {
+
+              name: topic,
+
+              lectures: []
+
+            };
+
+            subjectsMap[
+              subject
+            ].topics.push(
+              existingTopic
+            );
+
+          }
+
+          existingTopic
+          .lectures.push({
+
+            title: lecture,
+
+            url
+
+          });
 
         }
 
       });
+
+      const subjects =
+        Object.values(
+          subjectsMap
+        );
 
       const oldCourses =
         JSON.parse(
@@ -211,7 +227,7 @@ export default function Update() {
           marginBottom:"30px"
         }}
       >
-        Update Panel 😄🔥
+        StudyFlix Update 😄🔥
       </h1>
 
       <input
