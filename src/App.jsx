@@ -1,8 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
-import Admin from "./pages/Admin";
-import Dashboard from "./pages/Dashboard";
+import Update from "./pages/Update";
 import Player from "./pages/Player";
 
 function App() {
@@ -15,9 +14,7 @@ function App() {
 
         <Route path="/" element={<Home />} />
 
-        <Route path="/admin" element={<Admin />} />
-
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/update" element={<Update />} />
 
         <Route path="/player" element={<Player />} />
 
