@@ -1,7 +1,6 @@
+import axios from "axios";
 import { useEffect, useState }
 from "react";
-
-import axios from "axios";
 
 function Watch() {
 
@@ -17,34 +16,26 @@ function Watch() {
   const loadVideo =
   async () => {
 
-    try {
+    const params =
+    new URLSearchParams(
+      window.location.search
+    );
 
-      const params =
-      new URLSearchParams(
-        window.location.search
-      );
+    const id =
+    params.get("id");
 
-      const id =
-      params.get("id");
+    const res =
+    await axios.post(
 
-      const response =
-      await axios.post(
+      "https://studyflix-backend.onrender.com/api/watch",
 
-        "https://studyflix-backend.onrender.com/api/watch",
+      { id }
 
-        { id }
+    );
 
-      );
-
-      setVideo(
-        response.data.player
-      );
-
-    } catch (error) {
-
-      alert("Video Error");
-
-    }
+    setVideo(
+      res.data.player
+    );
 
   };
 
@@ -52,8 +43,9 @@ function Watch() {
 
     <div
       style={{
-        background:"#000",
-        minHeight:"100vh"
+        width:"100%",
+        height:"100vh",
+        background:"#000"
       }}
     >
 
@@ -61,19 +53,17 @@ function Watch() {
 
         video && (
 
-          <iframe
+          <video
+
+            controls
+
+            autoPlay
 
             src={video}
 
-            width="100%"
-
-            height="100%"
-
-            allowFullScreen
-
             style={{
-              border:"none",
-              minHeight:"100vh"
+              width:"100%",
+              height:"100%"
             }}
 
           />
