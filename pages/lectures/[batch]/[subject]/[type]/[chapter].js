@@ -96,16 +96,13 @@ export default function ChapterPage() {
           const videoChapter =
             normalize(v.chapter);
 
-          // subject exact
           const subjectMatch =
             videoSubject === currentSubject;
 
-          // type flexible
           const typeMatch =
             videoType.includes(currentType) ||
             currentType.includes(videoType);
 
-          // chapter flexible
           const chapterMatch =
             videoChapter === currentChapter ||
             videoChapter.includes(currentChapter) ||
@@ -141,16 +138,13 @@ export default function ChapterPage() {
 
     return (
 
-      <div
-        style={{
-          background: "#000",
-          minHeight: "100vh",
-          color: "white",
-          padding: 20
-        }}
-      >
+      <div className="bg-black min-h-screen text-white flex items-center justify-center">
 
-        <h1>Loading...</h1>
+        <h1 className="text-3xl font-bold animate-pulse">
+
+          Loading Lectures...
+
+        </h1>
 
       </div>
 
@@ -160,88 +154,126 @@ export default function ChapterPage() {
 
   return (
 
-    <div
-      style={{
-        background: "#000",
-        minHeight: "100vh",
-        color: "white",
-        padding: 20
-      }}
-    >
+    <div className="bg-black min-h-screen text-white p-5">
+
+      {/* BACK BUTTON */}
 
       <Link
         href={`/chapter/${batch}/${subject}/${type}`}
       >
 
-        <button
-          style={{
-            padding: "14px 24px",
-            borderRadius: 15,
-            border: "none",
-            background: "#111",
-            color: "white",
-            fontSize: 18,
-            marginBottom: 30
-          }}
-        >
+        <button className="px-6 py-4 rounded-2xl bg-zinc-900 text-white text-xl mb-10 hover:bg-zinc-800 transition-all">
+
           ← Back
+
         </button>
 
       </Link>
 
-      <h1
-        style={{
-          fontSize: 60,
-          marginBottom: 40
-        }}
-      >
-        {decodeURIComponent(chapter)}
-      </h1>
+      {/* PAGE TITLE */}
+
+      <div className="mb-10">
+
+        <img
+          src="https://i.ibb.co/cSzYznvY/file-00000000ae4071fab2fa429b25b81311.png"
+          className="w-28 mb-5"
+        />
+
+        <h1 className="text-5xl font-bold leading-tight">
+
+          {decodeURIComponent(chapter)}
+
+        </h1>
+
+        <p className="text-zinc-400 mt-3 text-lg">
+
+          Premium StudyFlix Lectures 😄
+
+        </p>
+
+      </div>
 
       {
 
         videos.length === 0 ? (
 
-          <h2
-            style={{
-              color: "red"
-            }}
-          >
-            No Lectures Found 😭
-          </h2>
+          <div className="bg-zinc-900 rounded-3xl p-10 text-center border border-red-500">
+
+            <h2 className="text-red-500 text-3xl font-bold">
+
+              No Lectures Found 😭
+
+            </h2>
+
+          </div>
 
         ) : (
 
-          videos.map((video, index) => (
+          <div className="grid gap-8">
 
-            <Link
-              key={video._id}
-              href={`/watch/${batch}/${video._id}`}
-            >
+            {
 
-              <div
-                style={{
-                  background: "#111",
-                  padding: 20,
-                  borderRadius: 20,
-                  marginBottom: 20,
-                  cursor: "pointer"
-                }}
-              >
+              videos.map((video, index) => (
 
-                <h2
-                  style={{
-                    fontSize: 28
-                  }}
+                <Link
+                  key={video._id}
+                  href={`/watch/${batch}/${video._id}`}
                 >
-                  {index + 1}. {video.title}
-                </h2>
 
-              </div>
+                  <div className="bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:border-purple-500 transition-all duration-300 shadow-xl hover:shadow-purple-500/30 cursor-pointer">
 
-            </Link>
+                    {/* THUMBNAIL */}
 
-          ))
+                    <div className="relative">
+
+                      <img
+                        src="https://i.ibb.co/cSzYznvY/file-00000000ae4071fab2fa429b25b81311.png"
+                        className="w-full h-56 object-cover"
+                      />
+
+                      <div className="absolute inset-0 bg-black/40"></div>
+
+                      <div className="absolute top-4 left-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+
+                        Lecture {index + 1}
+
+                      </div>
+
+                      <div className="absolute bottom-4 right-4 bg-black/70 px-4 py-2 rounded-full text-sm">
+
+                        ▶ Watch Now
+
+                      </div>
+
+                    </div>
+
+                    {/* CONTENT */}
+
+                    <div className="p-5">
+
+                      <h2 className="text-2xl font-bold leading-relaxed">
+
+                        {video.title}
+
+                      </h2>
+
+                      <p className="text-zinc-400 mt-3">
+
+                        {video.subject}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </Link>
+
+              ))
+
+            }
+
+          </div>
 
         )
 
