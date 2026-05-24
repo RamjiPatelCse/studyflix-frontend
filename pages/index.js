@@ -2,27 +2,34 @@ import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const API = "https://studyflix-backend.onrender.com";
+const API =
+"https://studyflix-backend.onrender.com";
 
 export default function Home() {
 
-  const [batches, setBatches] = useState([]);
+  const [batches, setBatches] =
+    useState([]);
 
   useEffect(() => {
+
     loadBatches();
+
   }, []);
 
   async function loadBatches() {
 
     try {
 
-      const res = await axios.get(
-        `${API}/api/batches`
-      );
+      const res =
+        await axios.get(
+          `${API}/api/batches`
+        );
 
       setBatches(res.data);
 
-    } catch (err) {
+    }
+
+    catch (err) {
 
       console.log(err);
 
@@ -32,41 +39,42 @@ export default function Home() {
 
   return (
 
-    <div className="min-h-screen bg-black text-white px-4 py-5">
+    <div className="bg-black min-h-screen text-white">
 
-      {/* HEADER */}
+      {/* TOP HEADER */}
 
-      <div className="flex items-center gap-4 mb-6">
+      <div className="px-5 pt-6 flex items-center justify-between">
 
-        <img
-          src="https://i.ibb.co/cSzYznvY/file-00000000ae4071fab2fa429b25b81311.png"
-          className="
-          w-16
-          h-16
-          rounded-2xl
-          object-cover
-          shadow-[0_0_25px_#9333ea]
-          "
-        />
+        <div className="flex items-center gap-4">
 
-        <div>
+          <img
+            src="https://i.ibb.co/cSzYznvY/file-00000000ae4071fab2fa429b25b81311.png"
+            className="w-16 h-16 rounded-2xl shadow-[0_0_25px_rgba(168,85,247,0.6)]"
+          />
 
-          <h1 className="
-          text-4xl
-          font-black
-          tracking-wide
-          bg-gradient-to-r
-          from-white
-          to-purple-500
-          bg-clip-text
-          text-transparent
-          ">
-            StudyFlix
-          </h1>
+          <div>
 
-          <p className="text-purple-400 text-sm">
-            Learn Anytime 🚀
-          </p>
+            <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-white via-purple-300 to-pink-500 bg-clip-text text-transparent">
+
+              StudyFlix
+
+            </h1>
+
+            <p className="text-zinc-400 text-sm md:text-base">
+
+              Learn Anytime 🚀
+
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* SEARCH */}
+
+        <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center text-2xl">
+
+          🔍
 
         </div>
 
@@ -74,217 +82,170 @@ export default function Home() {
 
       {/* HERO SECTION */}
 
-      <div
-        className="
-        relative
-        overflow-hidden
-        rounded-[30px]
-        mb-8
-        border
-        border-purple-700
-        shadow-[0_0_40px_rgba(168,85,247,0.5)]
-        "
-      >
+      <div className="px-5 mt-8">
 
-        <img
-          src="https://i.ibb.co/cSzYznvY/file-00000000ae4071fab2fa429b25b81311.png"
-          className="
-          w-full
-          h-[250px]
-          object-cover
-          brightness-50
-          "
-        />
+        <div className="relative rounded-[35px] overflow-hidden border border-purple-500/40 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
 
-        <div
-          className="
-          absolute
-          top-0
-          left-0
-          w-full
-          h-full
-          flex
-          flex-col
-          justify-center
-          px-6
-          "
-        >
+          <img
+            src="https://i.ibb.co/cSzYznvY/file-00000000ae4071fab2fa429b25b81311.png"
+            className="w-full h-[260px] md:h-[450px] object-cover"
+          />
 
-          <h1 className="
-          text-5xl
-          font-black
-          leading-tight
-          mb-3
-          ">
-            Learn
-            <br />
-            Anytime 🚀
-          </h1>
+          {/* OVERLAY */}
 
-          <p className="
-          text-zinc-300
-          text-lg
-          ">
-            Premium Courses For Your Bright Future
-          </p>
+          <div className="absolute inset-0 bg-black/60"></div>
 
-        </div>
+          {/* CONTENT */}
 
-      </div>
+          <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-center">
 
-      {/* TITLE */}
+            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-lg">
 
-      <div className="
-      flex
-      items-center
-      justify-between
-      mb-5
-      ">
+              Learn <br />
 
-        <h2 className="
-        text-2xl
-        font-bold
-        ">
-          ✨ Our Top Courses
-        </h2>
+              <span className="text-purple-400">
 
-        <p className="
-        text-purple-400
-        font-semibold
-        ">
-          View All
-        </p>
+                Anytime 🚀
 
-      </div>
+              </span>
 
-      {/* COURSES */}
+            </h1>
 
-      <div
-        className="
-        grid
-        grid-cols-1
-        md:grid-cols-2
-        gap-6
-        pb-10
-        "
-      >
+            <p className="mt-4 text-zinc-200 text-lg md:text-2xl max-w-[500px] leading-relaxed">
 
-        {batches.map((batch) => (
+              Premium Courses For Your Bright Future
 
-          <Link
-            href={`/batch/${batch._id}`}
-            key={batch._id}
-          >
+            </p>
 
-            <div
-              className="
-              bg-zinc-950
-              rounded-[28px]
-              overflow-hidden
-              border
-              border-zinc-800
-              shadow-[0_0_20px_rgba(0,0,0,0.6)]
-              active:scale-95
-              transition-all
-              duration-300
-              "
-            >
+            {/* FEATURES */}
 
-              {/* THUMBNAIL */}
+            <div className="flex gap-3 mt-6 flex-wrap">
 
-              <div className="relative">
+              <div className="bg-black/60 border border-purple-500/30 px-4 py-2 rounded-full text-sm md:text-base">
 
-                <img
-                  src={batch.thumbnail}
-                  className="
-                  w-full
-                  h-[260px]
-                  object-cover
-                  "
-                />
-
-                <div
-                  className="
-                  absolute
-                  inset-0
-                  bg-gradient-to-t
-                  from-black
-                  via-black/30
-                  to-transparent
-                  "
-                />
-
-                <div
-                  className="
-                  absolute
-                  bottom-0
-                  left-0
-                  w-full
-                  p-4
-                  "
-                >
-
-                  <div className="
-                  inline-block
-                  px-3
-                  py-1
-                  rounded-full
-                  bg-purple-600
-                  text-sm
-                  font-bold
-                  mb-3
-                  shadow-[0_0_15px_#9333ea]
-                  ">
-                    🔥 Premium Batch
-                  </div>
-
-                  <h2 className="
-                  text-3xl
-                  font-black
-                  leading-tight
-                  mb-2
-                  ">
-                    {batch.title}
-                  </h2>
-
-                  <p className="
-                  text-purple-300
-                  text-sm
-                  ">
-                    🎥 Live + Recorded + Notes
-                  </p>
-
-                </div>
+                📺 Live Classes
 
               </div>
 
-              {/* BUTTON */}
+              <div className="bg-black/60 border border-cyan-500/30 px-4 py-2 rounded-full text-sm md:text-base">
 
-              <div className="p-4">
+                ▶ Recorded
 
-                <button
-                  className="
-                  w-full
-                  py-3
-                  rounded-2xl
-                  text-lg
-                  font-bold
-                  bg-gradient-to-r
-                  from-purple-600
-                  to-pink-500
-                  shadow-[0_0_20px_rgba(168,85,247,0.5)]
-                  "
-                >
-                  Explore Now 🚀
-                </button>
+              </div>
+
+              <div className="bg-black/60 border border-pink-500/30 px-4 py-2 rounded-full text-sm md:text-base">
+
+                📝 PYQs
 
               </div>
 
             </div>
 
-          </Link>
+          </div>
 
-        ))}
+        </div>
+
+      </div>
+
+      {/* TOP COURSES */}
+
+      <div className="px-5 mt-10 flex items-center justify-between">
+
+        <h2 className="text-3xl md:text-4xl font-bold">
+
+          ✨ Our Top Courses
+
+        </h2>
+
+        <Link href="/courses">
+
+          <button className="text-purple-400 text-lg font-bold hover:text-pink-400 transition-all">
+
+            View All →
+
+          </button>
+
+        </Link>
+
+      </div>
+
+      {/* COURSE GRID */}
+
+      <div className="px-5 py-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+
+        {
+
+          batches.map((batch) => (
+
+            <Link
+              href={`/batch/${batch._id}`}
+              key={batch._id}
+            >
+
+              <div className="bg-zinc-900 rounded-[35px] overflow-hidden border border-zinc-800 hover:border-purple-500 transition-all duration-300 shadow-xl hover:shadow-purple-500/30 cursor-pointer">
+
+                {/* IMAGE */}
+
+                <div className="relative">
+
+                  <img
+                    src={batch.thumbnail}
+                    className="w-full h-64 md:h-72 object-cover"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+
+                  {/* BADGE */}
+
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-purple-600 to-pink-500 px-4 py-2 rounded-full font-bold shadow-lg">
+
+                    🔥 Premium Batch
+
+                  </div>
+
+                </div>
+
+                {/* CONTENT */}
+
+                <div className="p-5">
+
+                  <h2 className="text-3xl font-bold leading-tight">
+
+                    {batch.title}
+
+                  </h2>
+
+                  <div className="mt-3 flex items-center gap-2 text-zinc-300 text-lg">
+
+                    🎥 Live + Recorded + Notes
+
+                  </div>
+
+                  {/* BUTTON */}
+
+                  <button className="mt-6 w-full bg-gradient-to-r from-purple-600 to-pink-500 py-4 rounded-2xl text-xl font-bold shadow-lg hover:scale-[1.02] transition-all duration-300">
+
+                    Explore Now 🚀
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </Link>
+
+          ))
+
+        }
+
+      </div>
+
+      {/* FOOTER */}
+
+      <div className="border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm">
+
+        © 2026 StudyFlix • Learn Anytime 🚀
 
       </div>
 
@@ -292,4 +253,4 @@ export default function Home() {
 
   );
 
-          }
+}
