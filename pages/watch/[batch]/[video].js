@@ -14,31 +14,23 @@ export default function WatchPage(){
     video
   } = router.query;
 
-  const [url,setUrl] =
-    useState("");
-
-  const [videos,setVideos] =
-    useState([]);
-
-  const [currentIndex,setCurrentIndex] =
-    useState(-1);
-
   const [loading,setLoading] =
     useState(true);
+
+  const [error,setError] =
+    useState("");
 
   useEffect(()=>{
 
     if(batch && video){
 
-      loadVideo();
-
-      loadAllVideos();
+      playVideo();
 
     }
 
   },[batch,video]);
 
-  async function loadVideo(){
+  async function playVideo(){
 
     try{
 
@@ -49,13 +41,24 @@ export default function WatchPage(){
           `${API}/api/play/${batch}/${video}`
         );
 
-      if(res.data.url){
+      if(
+        res.data &&
+        res.data.url
+      ){
 
-        setUrl(res.data.url);
+        // DIRECT PLAYER OPEN
+        window.location.href =
+          res.data.url;
 
       }
 
-      setLoading(false);
+      else{
+
+        setError(
+          "Player URL Not Found"
+        );
+
+      }
 
     }
 
@@ -63,178 +66,70 @@ export default function WatchPage(){
 
       console.log(err);
 
-      setLoading(false);
-
-      alert("Video Load Failed");
-
-    }
-
-  }
-
-  async function loadAllVideos(){
-
-    try{
-
-      const res =
-        await axios.get(
-          `${API}/api/batches`
-        );
-
-      const batchData =
-        res.data.find(
-          (b)=>b._id === batch
-        );
-
-      if(!batchData) return;
-
-      setVideos(batchData.videos);
-
-      const index =
-        batchData.videos.findIndex(
-          (v)=>v._id === video
-        );
-
-      setCurrentIndex(index);
-
-    }
-
-    catch(err){
-
-      console.log(err);
-
-    }
-
-  }
-
-  function goBack(){
-
-    router.back();
-
-  }
-
-  function goHome(){
-
-    router.push("/");
-
-  }
-
-  function goPrev(){
-
-    if(currentIndex > 0){
-
-      const prevVideo =
-        videos[currentIndex - 1];
-
-      router.push(
-        `/watch/${batch}/${prevVideo._id}`
+      setError(
+        "Video Failed To Load"
       );
 
     }
 
-  }
-
-  function goNext(){
-
-    if(
-      currentIndex <
-      videos.length - 1
-    ){
-
-      const nextVideo =
-        videos[currentIndex + 1];
-
-      router.push(
-        `/watch/${batch}/${nextVideo._id}`
-      );
-
-    }
+    setLoading(false);
 
   }
 
   return(
 
-    <div className="bg-black min-h-screen text-white">
+    <div className="bg-black min-h-screen flex items-center justify-center text-white">
 
-      <div className="flex justify-between items-center p-4">
-
-        <div className="flex gap-3">
-
-          <button
-            onClick={goBack}
-            className="bg-zinc-800 px-4 py-2 rounded-xl"
-          >
-            ⬅ Back
-          </button>
-
-          <button
-            onClick={goHome}
-            className="bg-zinc-800 px-4 py-2 rounded-xl"
-          >
-            🏠 Home
-          </button>
-
-        </div>
-
-        <div className="text-sm text-zinc-400">
-
-          Lecture {
-            currentIndex + 1
-          } / {
-            videos.length
-          }
-
-        </div>
-
-      </div>
-
-      <div className="w-full h-[72vh] bg-black">
+      <div className="text-center">
 
         {
-          loading ? (
+          loading && (
 
-            <div className="flex items-center justify-center h-full text-2xl">
+            <div>
 
-              Loading Video...
+              <h1 className="text-3xl mb-3">
+
+                Loading Video...
+
+              </h1>
+
+              <p className="text-zinc-400">
+
+                Please Wait 😄
+
+              </p>
 
             </div>
-
-          ) : (
-
-            url && (
-
-              <iframe
-                src={url}
-                className="w-full h-full"
-                allowFullScreen
-              />
-
-            )
 
           )
         }
 
-      </div>
+        {
+          error && (
 
-      <div className="flex justify-center gap-5 p-5">
+            <div>
 
-        <button
-          onClick={goPrev}
-          disabled={currentIndex <= 0}
-          className="bg-red-600 px-5 py-3 rounded-xl disabled:opacity-40"
-        >
-          ⬅ Previous
-        </button>
+              <h1 className="text-red-500 text-2xl">
 
-        <button
-          onClick={goNext}
-          disabled={
-            currentIndex >=
-            videos.length - 1
-          }
-          className="bg-red-600 px-5 py-3 rounded-xl disabled:opacity-40"
-        >
-          Next ➡
-        </button>
+                {error}
+
+              </h1>
+
+              <button
+                onClick={() =>
+                  router.back()
+                }
+                className="mt-5 bg-red-600 px-5 py-3 rounded-xl"
+              >
+
+                ⬅ Go Back
+
+              </button>
+
+            </div>
+
+          )
+        }
 
       </div>
 
