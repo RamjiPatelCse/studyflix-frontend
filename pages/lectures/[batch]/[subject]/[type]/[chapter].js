@@ -1,11 +1,7 @@
-import axios from "axios";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
-const API = "https://studyflix-backend.onrender.com";
-
-export default function LecturePage(){
+export default function ChapterPage() {
 
   const router = useRouter();
 
@@ -16,96 +12,141 @@ export default function LecturePage(){
     chapter
   } = router.query;
 
-  const [videos,setVideos] = useState([]);
+  const [lectures, setLectures] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    if(batch){
+    if(
+      !batch ||
+      !subject ||
+      !type ||
+      !chapter
+    ) return;
 
-      loadVideos();
+    fetch(
+      `${process.env.NEXT_PUBLIC_API}/api/batches`
+    )
+    .then(res => res.json())
+    .then(data => {
 
-    }
-
-  },[batch]);
-
-  async function loadVideos(){
-
-    try{
-
-      const res = await axios.get(
-        `${API}/api/batches`
-      );
-
-      const data = res.data.find(
-        (b)=>b._id === batch
-      );
-
-      if(!data) return;
-
-      const filtered =
-        data.videos.filter(
-          (v)=>
-            v.subject === subject &&
-            v.type === type &&
-            v.chapter === chapter
+      const currentBatch =
+        data.find(
+          b => b._id === batch
         );
 
-      setVideos(filtered);
+      if(!currentBatch) return;
 
-    }
+      const filtered =
+        currentBatch.videos.filter(v =>
 
-    catch(err){
+          v.subject === decodeURIComponent(subject) &&
+          v.type === decodeURIComponent(type) &&
+          v.chapter === decodeURIComponent(chapter)
 
-      console.log(err);
+        );
 
-    }
+      setLectures(filtered);
 
-  }
+    });
 
-  return(
+  }, [batch, subject, type, chapter]);
 
-    <div className="p-5 bg-black min-h-screen text-white">
+  return (
 
-      <h1 className="text-3xl mb-5">
-        {chapter}
+    <div
+      style={{
+        background: "#000",
+        minHeight: "100vh",
+        padding: "20px",
+        color: "#fff"
+      }}
+    >
+
+      <button
+        onClick={() => router.back()}
+        style={{
+          marginBottom: "20px",
+          background: "#111",
+          color: "#fff",
+          border: "none",
+          padding: "10px 20px",
+          borderRadius: "10px"
+        }}
+      >
+        ← Back
+      </button>
+
+      <h1
+        style={{
+          marginBottom: "20px"
+        }}
+      >
+        {decodeURIComponent(chapter || "")}
       </h1>
 
-      <div className="grid gap-5">
+      {
 
-        {
-          videos.map((video)=>(
+        lectures.map((video, index) => (
 
-            <Link
-              key={video._id}
-              href={`/watch/${batch}/${video._id}`}
-            >
+          <div
 
-              <div className="bg-zinc-900 rounded-xl overflow-hidden">
+            key={index}
 
-                <img
-                  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop"
-                  className="w-full h-44 object-cover"
-                />
+            onClick={() =>
 
-                <div className="p-4">
+              router.push(
 
-                  <h2 className="text-lg font-bold">
-                    {video.title}
-                  </h2>
+                `/watch/${batch}/${video._id}`
 
-                </div>
+              )
 
-              </div>
+            }
 
-            </Link>
+            style={{
 
-          ))
-        }
+              background: "#111",
 
-      </div>
+              padding: "20px",
+
+              borderRadius: "20px",
+
+              marginBottom: "20px",
+
+              cursor: "pointer"
+
+            }}
+          >
+
+            <img
+
+              src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
+
+              style={{
+
+                width: "100%",
+
+                borderRadius: "15px",
+
+                marginBottom: "10px"
+
+              }}
+
+            />
+
+            <h2>
+
+              {video.title}
+
+            </h2>
+
+          </div>
+
+        ))
+
+      }
 
     </div>
 
-  )
+  );
 
 }
