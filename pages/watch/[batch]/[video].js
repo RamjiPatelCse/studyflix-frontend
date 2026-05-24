@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 
 const API = "https://studyflix-backend.onrender.com";
@@ -12,8 +12,6 @@ export default function WatchPage(){
     batch,
     video
   } = router.query;
-
-  const [url,setUrl] = useState("");
 
   useEffect(()=>{
 
@@ -33,7 +31,12 @@ export default function WatchPage(){
         `${API}/api/play/${batch}/${video}`
       );
 
-      setUrl(res.data.url);
+      if(res.data.url){
+
+        window.location.href =
+          res.data.url;
+
+      }
 
     }
 
@@ -41,25 +44,17 @@ export default function WatchPage(){
 
       console.log(err);
 
+      alert("Video Load Failed");
+
     }
 
   }
 
   return(
 
-    <div className="bg-black h-screen">
+    <div className="bg-black h-screen flex items-center justify-center text-white text-2xl">
 
-      {
-        url && (
-
-          <iframe
-            src={url}
-            className="w-full h-full"
-            allowFullScreen
-          />
-
-        )
-      }
+      Loading Video...
 
     </div>
 
