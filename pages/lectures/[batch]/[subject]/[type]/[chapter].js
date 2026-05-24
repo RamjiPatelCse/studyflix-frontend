@@ -1,10 +1,17 @@
+// =====================================
+// FILE:
+// pages/lectures/[batch]/[subject]/[type]/[chapter].js
+// =====================================
+
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function ChapterPage() {
 
+  // ROUTER
   const router = useRouter();
 
+  // URL PARAMS
   const {
     batch,
     subject,
@@ -12,21 +19,40 @@ export default function ChapterPage() {
     chapter
   } = router.query;
 
+  // LECTURES STATE
   const [lectures, setLectures] = useState([]);
 
-  function clean(text) {
+  // LOADING
+  const [loading, setLoading] = useState(true);
+
+  // =========================
+  // CLEAN TEXT FUNCTION
+  // =========================
+
+  const cleanText = (text) => {
 
     return decodeURIComponent(text || "")
-      .replace(/🔴/g, "")
-      .replace(/✅/g, "")
+
+      // REMOVE EMOJIS
+      .replace(/🔴|✅|📚|🎯/g, "")
+
+      // REMOVE EXTRA SPACES
       .replace(/\s+/g, " ")
+
       .trim()
+
+      // LOWERCASE
       .toLowerCase();
 
-  }
+  };
+
+  // =========================
+  // LOAD DATA
+  // =========================
 
   useEffect(() => {
 
+    // WAIT FOR ROUTER
     if(
       !batch ||
       !subject ||
@@ -34,46 +60,68 @@ export default function ChapterPage() {
       !chapter
     ) return;
 
-    async function loadData() {
+    async function loadLectures(){
 
-      try {
+      try{
 
+        // FETCH BATCHES
         const res = await fetch(
+
           `${process.env.NEXT_PUBLIC_API}/api/batches`
+
         );
 
         const data = await res.json();
 
-        const currentBatch =
-          data.find(b => b._id === batch);
+        // FIND CURRENT BATCH
+        const currentBatch = data.find(
+
+          (b) => b._id === batch
+
+        );
 
         if(!currentBatch){
 
-          setLectures([]);
+          setLoading(false);
           return;
 
         }
 
+        // =====================
+        // FILTER LECTURES
+        // =====================
+
         const filtered =
-          currentBatch.videos.filter(video => {
 
-            return (
+          currentBatch.videos.filter(
 
-              clean(video.subject) === clean(subject)
+            (video) => {
 
-              &&
+              return (
 
-              clean(video.type) === clean(type)
+                cleanText(video.subject) ===
+                cleanText(subject)
 
-              &&
+                &&
 
-              clean(video.chapter) === clean(chapter)
+                cleanText(video.type) ===
+                cleanText(type)
 
-            );
+                &&
 
-          });
+                cleanText(video.chapter) ===
+                cleanText(chapter)
 
+              );
+
+            }
+
+          );
+
+        // SAVE
         setLectures(filtered);
+
+        setLoading(false);
 
       }
 
@@ -81,15 +129,49 @@ export default function ChapterPage() {
 
         console.log(err);
 
+        setLoading(false);
+
       }
 
     }
 
-    loadData();
+    loadLectures();
 
   }, [batch, subject, type, chapter]);
 
-  return (
+  // =========================
+  // LOADING SCREEN
+  // =========================
+
+  if(loading){
+
+    return(
+
+      <div
+        style={{
+          background: "#000",
+          color: "#fff",
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "30px"
+        }}
+      >
+
+        Loading...
+
+      </div>
+
+    );
+
+  }
+
+  // =========================
+  // MAIN UI
+  // =========================
+
+  return(
 
     <div
       style={{
@@ -100,18 +182,32 @@ export default function ChapterPage() {
       }}
     >
 
+      {/* ===================== */}
+      {/* BACK BUTTON */}
+      {/* ===================== */}
+
       <button
 
         onClick={() => router.back()}
 
         style={{
+
           padding: "12px 20px",
+
           borderRadius: "12px",
+
           border: "none",
+
           background: "#111",
+
           color: "#fff",
-          marginBottom: "20px",
-          fontSize: "18px"
+
+          marginBottom: "25px",
+
+          fontSize: "18px",
+
+          cursor: "pointer"
+
         }}
       >
 
@@ -119,9 +215,13 @@ export default function ChapterPage() {
 
       </button>
 
+      {/* ===================== */}
+      {/* TITLE */}
+      {/* ===================== */}
+
       <h1
         style={{
-          fontSize: "45px",
+          fontSize: "42px",
           marginBottom: "30px"
         }}
       >
@@ -130,9 +230,13 @@ export default function ChapterPage() {
 
       </h1>
 
+      {/* ===================== */}
+      {/* NO LECTURES */}
+      {/* ===================== */}
+
       {
 
-        lectures.length === 0 ? (
+        lectures.length === 0 && (
 
           <h2
             style={{
@@ -144,76 +248,100 @@ export default function ChapterPage() {
 
           </h2>
 
-        ) : (
+        )
 
-          lectures.map((video, index) => (
+      }
 
-            <div
+      {/* ===================== */}
+      {/* LECTURES */}
+      {/* ===================== */}
 
-              key={index}
+      {
 
-              onClick={() =>
+        lectures.map((video, index) => (
 
-                router.push(
-                  `/watch/${batch}/${video._id}`
-                )
+          <div
 
-              }
+            key={index}
+
+            // =====================
+            // IMPORTANT FIX 😄
+            // VIDEO_ID SEND KARO
+            // TITLE NAHI
+            // =====================
+
+            onClick={() =>
+
+              router.push(
+
+                `/watch/${batch}/${video._id}`
+
+              )
+
+            }
+
+            style={{
+
+              background: "#111",
+
+              borderRadius: "20px",
+
+              overflow: "hidden",
+
+              marginBottom: "25px",
+
+              cursor: "pointer"
+
+            }}
+          >
+
+            {/* ================= */}
+            {/* THUMBNAIL */}
+            {/* ================= */}
+
+            <img
+
+              src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
+
+              alt="thumbnail"
 
               style={{
 
-                background: "#111",
+                width: "100%",
 
-                borderRadius: "20px",
+                height: "220px",
 
-                overflow: "hidden",
+                objectFit: "cover"
 
-                marginBottom: "25px",
+              }}
 
-                cursor: "pointer"
+            />
 
+            {/* ================= */}
+            {/* TITLE */}
+            {/* ================= */}
+
+            <div
+              style={{
+                padding: "20px"
               }}
             >
 
-              <img
-
-                src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
-
+              <h2
                 style={{
-
-                  width: "100%",
-
-                  height: "220px",
-
-                  objectFit: "cover"
-
-                }}
-
-              />
-
-              <div
-                style={{
-                  padding: "20px"
+                  fontSize: "24px"
                 }}
               >
 
-                <h2
-                  style={{
-                    fontSize: "25px"
-                  }}
-                >
+                {video.title}
 
-                  {video.title}
-
-                </h2>
-
-              </div>
+              </h2>
 
             </div>
 
-          ))
+          </div>
 
-        )
+        ))
 
       }
 
@@ -221,4 +349,4 @@ export default function ChapterPage() {
 
   );
 
-}
+      }
