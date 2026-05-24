@@ -1,49 +1,111 @@
 import axios from "axios";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const API = "https://studyflix-backend.onrender.com";
 
-export default function WatchPage() {
+export default function LecturePage(){
 
-  const [video, setVideo] = useState("");
+  const router = useRouter();
 
-  useEffect(() => {
+  const {
+    batch,
+    subject,
+    type,
+    chapter
+  } = router.query;
 
-    loadVideo();
+  const [videos,setVideos] = useState([]);
 
-  }, []);
+  useEffect(()=>{
 
-  async function loadVideo() {
+    if(batch){
 
-    try {
+      loadVideos();
+
+    }
+
+  },[batch]);
+
+  async function loadVideos(){
+
+    try{
 
       const res = await axios.get(
-        `${API}/api/play/1`
+        `${API}/api/batches`
       );
 
-      setVideo(res.data.url);
+      const data = res.data.find(
+        (b)=>b._id === batch
+      );
 
-    } catch (err) {
+      if(!data) return;
+
+      const filtered =
+        data.videos.filter(
+          (v)=>
+            v.subject === subject &&
+            v.type === type &&
+            v.chapter === chapter
+        );
+
+      setVideos(filtered);
+
+    }
+
+    catch(err){
+
       console.log(err);
+
     }
 
   }
 
-  return (
-    <div className="bg-black h-screen">
+  return(
 
-      {video && (
+    <div className="p-5 bg-black min-h-screen text-white">
 
-        <video
-          src={video}
-          controls
-          autoPlay
-          className="w-full h-full"
-          onError={loadVideo}
-        />
+      <h1 className="text-3xl mb-5">
+        {chapter}
+      </h1>
 
-      )}
+      <div className="grid gap-5">
+
+        {
+          videos.map((video)=>(
+
+            <Link
+              key={video._id}
+              href={`/watch/${batch}/${video._id}`}
+            >
+
+              <div className="bg-zinc-900 rounded-xl overflow-hidden">
+
+                <img
+                  src="https://i.imgur.com/8Km9tLL.jpg"
+                  className="w-full h-44 object-cover"
+                />
+
+                <div className="p-4">
+
+                  <h2 className="text-lg font-bold">
+                    {video.title}
+                  </h2>
+
+                </div>
+
+              </div>
+
+            </Link>
+
+          ))
+        }
+
+      </div>
 
     </div>
-  );
+
+  )
+
 }
