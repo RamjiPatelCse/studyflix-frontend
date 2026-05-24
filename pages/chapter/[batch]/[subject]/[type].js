@@ -19,8 +19,10 @@ export default function ChapterPage() {
 
   useEffect(() => {
 
-    if (batch) {
+    if(batch){
+
       loadChapters();
+
     }
 
   }, [batch]);
@@ -37,7 +39,7 @@ export default function ChapterPage() {
         (b) => b._id === batch
       );
 
-      if (!data) return;
+      if(!data) return;
 
       const filtered =
         data.videos.filter(
@@ -56,13 +58,18 @@ export default function ChapterPage() {
 
       setChapters(unique);
 
-    } catch (err) {
+    }
+
+    catch(err){
+
       console.log(err);
+
     }
 
   }
 
   return (
+
     <div className="p-5 bg-black min-h-screen text-white">
 
       <h1 className="text-3xl mb-5">
@@ -71,25 +78,29 @@ export default function ChapterPage() {
 
       <div className="grid gap-4">
 
-        {chapters.map((chapter) => (
+        {
+          chapters.map((chapter)=>(
 
-          <Link
-            key={chapter}
-            href={`/watch/${batch}/${subject}/${type}/${chapter}`}
-          >
+            <Link
+              key={chapter}
+              href={`/lectures/${batch}/${subject}/${type}/${chapter}`}
+            >
 
-            <div className="bg-zinc-900 p-5 rounded-xl">
+              <div className="bg-zinc-900 p-5 rounded-xl">
 
-              {chapter}
+                {chapter}
 
-            </div>
+              </div>
 
-          </Link>
+            </Link>
 
-        ))}
+          ))
+        }
 
       </div>
 
     </div>
-  );
+
+  )
+
 }
