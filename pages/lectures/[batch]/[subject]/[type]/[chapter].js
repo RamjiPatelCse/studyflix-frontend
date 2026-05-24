@@ -14,6 +14,8 @@ export default function ChapterPage() {
 
   const [lectures, setLectures] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
 
     if(
@@ -23,33 +25,96 @@ export default function ChapterPage() {
       !chapter
     ) return;
 
-    fetch(
-      `${process.env.NEXT_PUBLIC_API}/api/batches`
-    )
-    .then(res => res.json())
-    .then(data => {
+    async function loadLectures() {
 
-      const currentBatch =
-        data.find(
+      try {
+
+        const res = await fetch(
+
+          `${process.env.NEXT_PUBLIC_API}/api/batches`
+
+        );
+
+        const data = await res.json();
+
+        const currentBatch = data.find(
+
           b => b._id === batch
-        );
-
-      if(!currentBatch) return;
-
-      const filtered =
-        currentBatch.videos.filter(v =>
-
-          v.subject === decodeURIComponent(subject) &&
-          v.type === decodeURIComponent(type) &&
-          v.chapter === decodeURIComponent(chapter)
 
         );
 
-      setLectures(filtered);
+        if(!currentBatch){
 
-    });
+          setLoading(false);
+          return;
+
+        }
+
+        const filtered =
+          currentBatch.videos.filter(v =>
+
+            v.subject?.trim().toLowerCase() ===
+            decodeURIComponent(subject)
+            .trim()
+            .toLowerCase()
+
+            &&
+
+            v.type?.trim().toLowerCase() ===
+            decodeURIComponent(type)
+            .trim()
+            .toLowerCase()
+
+            &&
+
+            v.chapter?.trim().toLowerCase() ===
+            decodeURIComponent(chapter)
+            .trim()
+            .toLowerCase()
+
+          );
+
+        setLectures(filtered);
+
+        setLoading(false);
+
+      }
+
+      catch(err){
+
+        console.log(err);
+
+        setLoading(false);
+
+      }
+
+    }
+
+    loadLectures();
 
   }, [batch, subject, type, chapter]);
+
+  if(loading){
+
+    return (
+
+      <div
+        style={{
+          background: "#000",
+          minHeight: "100vh",
+          color: "#fff",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "25px"
+        }}
+      >
+        Loading...
+      </div>
+
+    );
+
+  }
 
   return (
 
@@ -62,27 +127,105 @@ export default function ChapterPage() {
       }}
     >
 
-      <button
-        onClick={() => router.back()}
-        style={{
-          marginBottom: "20px",
-          background: "#111",
-          color: "#fff",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: "10px"
-        }}
-      >
-        ← Back
-      </button>
+      {/* TOP BUTTONS */}
 
-      <h1
+      <div
         style={{
+          display: "flex",
+          gap: "10px",
           marginBottom: "20px"
         }}
       >
+
+        <button
+
+          onClick={() => router.back()}
+
+          style={{
+
+            background: "#111",
+
+            color: "#fff",
+
+            border: "none",
+
+            padding: "12px 20px",
+
+            borderRadius: "12px",
+
+            fontSize: "18px"
+
+          }}
+        >
+
+          ← Back
+
+        </button>
+
+        <button
+
+          onClick={() => router.push("/")}
+
+          style={{
+
+            background: "#111",
+
+            color: "#fff",
+
+            border: "none",
+
+            padding: "12px 20px",
+
+            borderRadius: "12px",
+
+            fontSize: "18px"
+
+          }}
+        >
+
+          🏠 Home
+
+        </button>
+
+      </div>
+
+      {/* TITLE */}
+
+      <h1
+        style={{
+          marginBottom: "25px",
+          fontSize: "42px"
+        }}
+      >
+
         {decodeURIComponent(chapter || "")}
+
       </h1>
+
+      {/* EMPTY */}
+
+      {
+
+        lectures.length === 0 && (
+
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "100px",
+              color: "#888",
+              fontSize: "22px"
+            }}
+          >
+
+            No Lectures Found 😭
+
+          </div>
+
+        )
+
+      }
+
+      {/* LECTURES */}
 
       {
 
@@ -106,11 +249,11 @@ export default function ChapterPage() {
 
               background: "#111",
 
-              padding: "20px",
-
               borderRadius: "20px",
 
-              marginBottom: "20px",
+              marginBottom: "25px",
+
+              overflow: "hidden",
 
               cursor: "pointer"
 
@@ -121,23 +264,38 @@ export default function ChapterPage() {
 
               src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
 
+              alt="thumbnail"
+
               style={{
 
                 width: "100%",
 
-                borderRadius: "15px",
+                height: "220px",
 
-                marginBottom: "10px"
+                objectFit: "cover"
 
               }}
 
             />
 
-            <h2>
+            <div
+              style={{
+                padding: "18px"
+              }}
+            >
 
-              {video.title}
+              <h2
+                style={{
+                  fontSize: "24px",
+                  lineHeight: "35px"
+                }}
+              >
 
-            </h2>
+                {video.title}
+
+              </h2>
+
+            </div>
 
           </div>
 
