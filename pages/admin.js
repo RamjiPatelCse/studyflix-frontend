@@ -9,11 +9,13 @@ export default function AdminPage() {
 
   const [thumbnail, setThumbnail] = useState("");
 
-  const [text, setText] = useState("");
+  const [file, setFile] = useState(null);
 
   async function uploadBatch() {
 
     try {
+
+      const text = await file.text();
 
       await axios.post(
         `${API}/api/upload`,
@@ -58,19 +60,18 @@ export default function AdminPage() {
         onChange={(e)=>setThumbnail(e.target.value)}
       />
 
-      <textarea
-        rows={15}
-        placeholder="Paste TXT Here"
+      <input
+        type="file"
+        accept=".txt"
         className="w-full p-3 mb-4 bg-zinc-900 rounded-xl"
-        value={text}
-        onChange={(e)=>setText(e.target.value)}
+        onChange={(e)=>setFile(e.target.files[0])}
       />
 
       <button
         onClick={uploadBatch}
         className="bg-red-600 px-5 py-3 rounded-xl"
       >
-        Upload Batch
+        Upload TXT File
       </button>
 
     </div>
