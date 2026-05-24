@@ -83,7 +83,7 @@ export default function LecturePage(){
               <div className="bg-zinc-900 rounded-xl overflow-hidden">
 
                 <img
-                  src="https://i.imgur.com/8Km9tLL.jpg"
+                  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop"
                   className="w-full h-44 object-cover"
                 />
 
