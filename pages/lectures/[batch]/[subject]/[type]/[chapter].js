@@ -14,7 +14,16 @@ export default function ChapterPage() {
 
   const [lectures, setLectures] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  function clean(text) {
+
+    return decodeURIComponent(text || "")
+      .replace(/🔴/g, "")
+      .replace(/✅/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+
+  }
 
   useEffect(() => {
 
@@ -25,58 +34,46 @@ export default function ChapterPage() {
       !chapter
     ) return;
 
-    async function loadLectures() {
+    async function loadData() {
 
       try {
 
         const res = await fetch(
-
           `${process.env.NEXT_PUBLIC_API}/api/batches`
-
         );
 
         const data = await res.json();
 
-        const currentBatch = data.find(
-
-          b => b._id === batch
-
-        );
+        const currentBatch =
+          data.find(b => b._id === batch);
 
         if(!currentBatch){
 
-          setLoading(false);
+          setLectures([]);
           return;
 
         }
 
         const filtered =
-          currentBatch.videos.filter(v =>
+          currentBatch.videos.filter(video => {
 
-            v.subject?.trim().toLowerCase() ===
-            decodeURIComponent(subject)
-            .trim()
-            .toLowerCase()
+            return (
 
-            &&
+              clean(video.subject) === clean(subject)
 
-            v.type?.trim().toLowerCase() ===
-            decodeURIComponent(type)
-            .trim()
-            .toLowerCase()
+              &&
 
-            &&
+              clean(video.type) === clean(type)
 
-            v.chapter?.trim().toLowerCase() ===
-            decodeURIComponent(chapter)
-            .trim()
-            .toLowerCase()
+              &&
 
-          );
+              clean(video.chapter) === clean(chapter)
+
+            );
+
+          });
 
         setLectures(filtered);
-
-        setLoading(false);
 
       }
 
@@ -84,37 +81,13 @@ export default function ChapterPage() {
 
         console.log(err);
 
-        setLoading(false);
-
       }
 
     }
 
-    loadLectures();
+    loadData();
 
   }, [batch, subject, type, chapter]);
-
-  if(loading){
-
-    return (
-
-      <div
-        style={{
-          background: "#000",
-          minHeight: "100vh",
-          color: "#fff",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "25px"
-        }}
-      >
-        Loading...
-      </div>
-
-    );
-
-  }
 
   return (
 
@@ -127,74 +100,29 @@ export default function ChapterPage() {
       }}
     >
 
-      {/* TOP BUTTONS */}
+      <button
 
-      <div
+        onClick={() => router.back()}
+
         style={{
-          display: "flex",
-          gap: "10px",
-          marginBottom: "20px"
+          padding: "12px 20px",
+          borderRadius: "12px",
+          border: "none",
+          background: "#111",
+          color: "#fff",
+          marginBottom: "20px",
+          fontSize: "18px"
         }}
       >
 
-        <button
+        ← Back
 
-          onClick={() => router.back()}
-
-          style={{
-
-            background: "#111",
-
-            color: "#fff",
-
-            border: "none",
-
-            padding: "12px 20px",
-
-            borderRadius: "12px",
-
-            fontSize: "18px"
-
-          }}
-        >
-
-          ← Back
-
-        </button>
-
-        <button
-
-          onClick={() => router.push("/")}
-
-          style={{
-
-            background: "#111",
-
-            color: "#fff",
-
-            border: "none",
-
-            padding: "12px 20px",
-
-            borderRadius: "12px",
-
-            fontSize: "18px"
-
-          }}
-        >
-
-          🏠 Home
-
-        </button>
-
-      </div>
-
-      {/* TITLE */}
+      </button>
 
       <h1
         style={{
-          marginBottom: "25px",
-          fontSize: "42px"
+          fontSize: "45px",
+          marginBottom: "30px"
         }}
       >
 
@@ -202,104 +130,90 @@ export default function ChapterPage() {
 
       </h1>
 
-      {/* EMPTY */}
-
       {
 
-        lectures.length === 0 && (
+        lectures.length === 0 ? (
 
-          <div
+          <h2
             style={{
-              textAlign: "center",
-              marginTop: "100px",
-              color: "#888",
-              fontSize: "22px"
+              color: "red"
             }}
           >
 
             No Lectures Found 😭
 
-          </div>
+          </h2>
 
-        )
+        ) : (
 
-      }
-
-      {/* LECTURES */}
-
-      {
-
-        lectures.map((video, index) => (
-
-          <div
-
-            key={index}
-
-            onClick={() =>
-
-              router.push(
-
-                `/watch/${batch}/${video._id}`
-
-              )
-
-            }
-
-            style={{
-
-              background: "#111",
-
-              borderRadius: "20px",
-
-              marginBottom: "25px",
-
-              overflow: "hidden",
-
-              cursor: "pointer"
-
-            }}
-          >
-
-            <img
-
-              src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
-
-              alt="thumbnail"
-
-              style={{
-
-                width: "100%",
-
-                height: "220px",
-
-                objectFit: "cover"
-
-              }}
-
-            />
+          lectures.map((video, index) => (
 
             <div
+
+              key={index}
+
+              onClick={() =>
+
+                router.push(
+                  `/watch/${batch}/${video._id}`
+                )
+
+              }
+
               style={{
-                padding: "18px"
+
+                background: "#111",
+
+                borderRadius: "20px",
+
+                overflow: "hidden",
+
+                marginBottom: "25px",
+
+                cursor: "pointer"
+
               }}
             >
 
-              <h2
+              <img
+
+                src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
+
                 style={{
-                  fontSize: "24px",
-                  lineHeight: "35px"
+
+                  width: "100%",
+
+                  height: "220px",
+
+                  objectFit: "cover"
+
+                }}
+
+              />
+
+              <div
+                style={{
+                  padding: "20px"
                 }}
               >
 
-                {video.title}
+                <h2
+                  style={{
+                    fontSize: "25px"
+                  }}
+                >
 
-              </h2>
+                  {video.title}
+
+                </h2>
+
+              </div>
 
             </div>
 
-          </div>
+          ))
 
-        ))
+        )
 
       }
 
