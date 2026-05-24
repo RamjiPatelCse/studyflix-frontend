@@ -1,17 +1,12 @@
-// =====================================
-// FILE:
-// pages/lectures/[batch]/[subject]/[type]/[chapter].js
-// =====================================
-
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import Link from "next/link";
 
 export default function ChapterPage() {
 
-  // ROUTER
   const router = useRouter();
 
-  // URL PARAMS
   const {
     batch,
     subject,
@@ -19,147 +14,143 @@ export default function ChapterPage() {
     chapter
   } = router.query;
 
-  // LECTURES STATE
-  const [lectures, setLectures] = useState([]);
+  const [videos, setVideos] = useState([]);
 
-  // LOADING
   const [loading, setLoading] = useState(true);
 
-  // =========================
-  // CLEAN TEXT FUNCTION
-  // =========================
-
-  const cleanText = (text) => {
-
-    return decodeURIComponent(text || "")
-
-      // REMOVE EMOJIS
-      .replace(/🔴|✅|📚|🎯/g, "")
-
-      // REMOVE EXTRA SPACES
-      .replace(/\s+/g, " ")
-
-      .trim()
-
-      // LOWERCASE
-      .toLowerCase();
-
-  };
-
-  // =========================
-  // LOAD DATA
-  // =========================
+  const BACKEND =
+    "https://studyflix-backend.onrender.com";
 
   useEffect(() => {
 
-    // WAIT FOR ROUTER
-    if(
+    if (
       !batch ||
       !subject ||
       !type ||
       !chapter
     ) return;
 
-    async function loadLectures(){
+    fetchVideos();
 
-      try{
+  }, [
+    batch,
+    subject,
+    type,
+    chapter
+  ]);
 
-        // FETCH BATCHES
-        const res = await fetch(
+  const normalize = (text = "") => {
 
-          `${process.env.NEXT_PUBLIC_API}/api/batches`
+    return decodeURIComponent(text)
+      .replace(/🔴|✅|🟠/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
 
+  };
+
+  async function fetchVideos() {
+
+    try {
+
+      setLoading(true);
+
+      const res =
+        await axios.get(
+          `${BACKEND}/api/batches`
         );
 
-        const data = await res.json();
+      const batches = res.data;
 
-        // FIND CURRENT BATCH
-        const currentBatch = data.find(
-
+      const currentBatch =
+        batches.find(
           (b) => b._id === batch
-
         );
 
-        if(!currentBatch){
+      if (!currentBatch) {
 
-          setLoading(false);
-          return;
+        setVideos([]);
+        setLoading(false);
+        return;
 
-        }
+      }
 
-        // =====================
-        // FILTER LECTURES
-        // =====================
+      const currentSubject =
+        normalize(subject);
 
-        const filtered =
+      const currentType =
+        normalize(type);
 
-          currentBatch.videos.filter(
+      const currentChapter =
+        normalize(chapter);
 
-            (video) => {
+      const filteredVideos =
+        currentBatch.videos.filter((v) => {
 
-              return (
+          const videoSubject =
+            normalize(v.subject);
 
-                cleanText(video.subject) ===
-                cleanText(subject)
+          const videoType =
+            normalize(v.type);
 
-                &&
+          const videoChapter =
+            normalize(v.chapter);
 
-                cleanText(video.type) ===
-                cleanText(type)
+          // subject exact
+          const subjectMatch =
+            videoSubject === currentSubject;
 
-                &&
+          // type flexible
+          const typeMatch =
+            videoType.includes(currentType) ||
+            currentType.includes(videoType);
 
-                cleanText(video.chapter) ===
-                cleanText(chapter)
+          // chapter flexible
+          const chapterMatch =
+            videoChapter === currentChapter ||
+            videoChapter.includes(currentChapter) ||
+            currentChapter.includes(videoChapter);
 
-              );
-
-            }
-
+          return (
+            subjectMatch &&
+            typeMatch &&
+            chapterMatch
           );
 
-        // SAVE
-        setLectures(filtered);
+        });
 
-        setLoading(false);
+      setVideos(filteredVideos);
 
-      }
-
-      catch(err){
-
-        console.log(err);
-
-        setLoading(false);
-
-      }
+      setLoading(false);
 
     }
 
-    loadLectures();
+    catch (err) {
 
-  }, [batch, subject, type, chapter]);
+      console.log(err);
 
-  // =========================
-  // LOADING SCREEN
-  // =========================
+      setVideos([]);
 
-  if(loading){
+      setLoading(false);
 
-    return(
+    }
+
+  }
+
+  if (loading) {
+
+    return (
 
       <div
         style={{
           background: "#000",
-          color: "#fff",
           minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "30px"
+          color: "white",
+          padding: 20
         }}
       >
 
-        Loading...
+        <h1>Loading...</h1>
 
       </div>
 
@@ -167,181 +158,92 @@ export default function ChapterPage() {
 
   }
 
-  // =========================
-  // MAIN UI
-  // =========================
-
-  return(
+  return (
 
     <div
       style={{
         background: "#000",
         minHeight: "100vh",
-        padding: "20px",
-        color: "#fff"
+        color: "white",
+        padding: 20
       }}
     >
 
-      {/* ===================== */}
-      {/* BACK BUTTON */}
-      {/* ===================== */}
-
-      <button
-
-        onClick={() => router.back()}
-
-        style={{
-
-          padding: "12px 20px",
-
-          borderRadius: "12px",
-
-          border: "none",
-
-          background: "#111",
-
-          color: "#fff",
-
-          marginBottom: "25px",
-
-          fontSize: "18px",
-
-          cursor: "pointer"
-
-        }}
+      <Link
+        href={`/chapter/${batch}/${subject}/${type}`}
       >
 
-        ← Back
+        <button
+          style={{
+            padding: "14px 24px",
+            borderRadius: 15,
+            border: "none",
+            background: "#111",
+            color: "white",
+            fontSize: 18,
+            marginBottom: 30
+          }}
+        >
+          ← Back
+        </button>
 
-      </button>
-
-      {/* ===================== */}
-      {/* TITLE */}
-      {/* ===================== */}
+      </Link>
 
       <h1
         style={{
-          fontSize: "42px",
-          marginBottom: "30px"
+          fontSize: 60,
+          marginBottom: 40
         }}
       >
-
-        {decodeURIComponent(chapter || "")}
-
+        {decodeURIComponent(chapter)}
       </h1>
-
-      {/* ===================== */}
-      {/* NO LECTURES */}
-      {/* ===================== */}
 
       {
 
-        lectures.length === 0 && (
+        videos.length === 0 ? (
 
           <h2
             style={{
               color: "red"
             }}
           >
-
             No Lectures Found 😭
-
           </h2>
 
-        )
+        ) : (
 
-      }
+          videos.map((video, index) => (
 
-      {/* ===================== */}
-      {/* LECTURES */}
-      {/* ===================== */}
-
-      {
-
-        lectures.map((video, index) => (
-
-          <div
-
-            key={index}
-
-            // =====================
-            // IMPORTANT FIX 😄
-            // VIDEO_ID SEND KARO
-            // TITLE NAHI
-            // =====================
-
-            onClick={() =>
-
-              router.push(
-
-                `/watch/${batch}/${video._id}`
-
-              )
-
-            }
-
-            style={{
-
-              background: "#111",
-
-              borderRadius: "20px",
-
-              overflow: "hidden",
-
-              marginBottom: "25px",
-
-              cursor: "pointer"
-
-            }}
-          >
-
-            {/* ================= */}
-            {/* THUMBNAIL */}
-            {/* ================= */}
-
-            <img
-
-              src="https://i.ibb.co/7tL5zQw/studyflix-thumb.jpg"
-
-              alt="thumbnail"
-
-              style={{
-
-                width: "100%",
-
-                height: "220px",
-
-                objectFit: "cover"
-
-              }}
-
-            />
-
-            {/* ================= */}
-            {/* TITLE */}
-            {/* ================= */}
-
-            <div
-              style={{
-                padding: "20px"
-              }}
+            <Link
+              key={video._id}
+              href={`/watch/${batch}/${video._id}`}
             >
 
-              <h2
+              <div
                 style={{
-                  fontSize: "24px"
+                  background: "#111",
+                  padding: 20,
+                  borderRadius: 20,
+                  marginBottom: 20,
+                  cursor: "pointer"
                 }}
               >
 
-                {video.title}
+                <h2
+                  style={{
+                    fontSize: 28
+                  }}
+                >
+                  {index + 1}. {video.title}
+                </h2>
 
-              </h2>
+              </div>
 
-            </div>
+            </Link>
 
-          </div>
+          ))
 
-        ))
+        )
 
       }
 
@@ -349,4 +251,4 @@ export default function ChapterPage() {
 
   );
 
-      }
+}
